@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/menu_home"
+        android:icon="@drawable/ic_home"
+        android:iconTint="@color/medium_blue"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/menu_favorites"
+        android:icon="@drawable/ic_favorite"
+        android:iconTint="@color/red_300"
+        android:title="Favoritos" />
+
+</menu>
