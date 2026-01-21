@@ -7,10 +7,10 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/ltEmptyFavorites"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:indeterminate="true"
-        app:lottie_rawRes="@raw/cat_404"
+        app:lottie_rawRes="@raw/cat_favorite"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_speed="1.0"
@@ -21,14 +21,15 @@
         />
 
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/tvTitleImg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/plus_jakarta_sans"
         android:gravity="center"
-        android:text="Sem favoritos ainda :("
+        android:text="@string/titulo_sem_favoritos"
         android:textColor="@color/dark_blue"
         android:textSize="20sp"
+        android:padding="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ltEmptyFavorites" />
@@ -38,10 +39,11 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/plus_jakarta_sans"
         android:gravity="center"
-        android:text="Toque no coração em qualquer gatinho para adicioná-lo aos favoritos"
+        android:text="@string/subtitulo_sem_favoritos"
         android:textColor="@color/dark_blue"
         android:textSize="15sp"
+        android:padding="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTitleImg" />
 </androidx.constraintlayout.widget.ConstraintLayout>

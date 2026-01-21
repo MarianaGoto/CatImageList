@@ -4,4 +4,6 @@
     <string name="cats">Catálogo de Gatos!</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="titulo_sem_favoritos">Sem favoritos ainda :(</string>
+    <string name="subtitulo_sem_favoritos">Toque no coração em qualquer gatinho da página home para adicioná-lo aos favoritos</string>
 </resources>
