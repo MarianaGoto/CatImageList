@@ -99,7 +99,7 @@ Este projeto está sob a licença MIT. Veja o arquivo LICENSE para detalhes.
 
 ## Autor
 
-Desenvolvido por Mariana Silva
+Desenvolvido por Mariana Goto
 
 ## Agradecimentos
 
