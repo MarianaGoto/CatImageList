@@ -40,9 +40,12 @@ class FavoritesFragment : Fragment() {
         binding.recyclerViewFavorites.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.recyclerViewFavorites.adapter = adapter
 
-        viewModel.cats.observe(viewLifecycleOwner) { list ->
-            val favorites = list.filter { it.isFavorite }
-            adapter.submitList(favorites)
+        viewModel.favorites.observe(viewLifecycleOwner) { favorites ->
+            if (favorites.isEmpty()) {
+                (activity as? MainActivity)?.openFragment(EmptyFavoritesFragment())
+            } else {
+                adapter.submitList(favorites)
+            }
         }
     }
 
