@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.marianagoto.catimagelist.databinding.ActivityMainBinding
 import com.marianagoto.catimagelist.di.CatViewModelFactory
 import com.marianagoto.catimagelist.ui.catlist.CatUiState
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity() {
     private fun animateIconOnly(menuItemId: Int) {
         val menuItemView = binding.bottomNavigation.findViewById<View>(menuItemId)
 
-        if (menuItemView is com.google.android.material.bottomnavigation.BottomNavigationItemView) {
+        if (menuItemView is BottomNavigationItemView) {
             var iconView: View? = null
 
             if (menuItemView is android.view.ViewGroup) {

@@ -70,11 +70,6 @@ class CatViewModel(
         _favorites.value = favoritesList
     }
 
-    //  * Define uma lista de gatos (usado por exemplo, ao carregar favoritos).
-    fun setCats(list: List<CatImage>) {
-        _cats.value = list
-        updateFavoriteState()
-    }
 
     //    * Retorna a lista de gatos favoritos.
     fun getFavorites(): List<CatImage> {

@@ -61,7 +61,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.lottie)
-
+    implementation(libs.android.utils)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

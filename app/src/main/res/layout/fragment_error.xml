@@ -1,62 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/plus_jakarta_sans"
-        android:gravity="center"
-        android:text="@string/error_tvtitle"
-        android:padding="10dp"
-        android:textColor="@color/dark_blue"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/ltError" />
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/ltError"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:src="@drawable/cat_404"
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
 
-    <TextView
-        android:id="@+id/tvSubtitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/plus_jakarta_sans"
-        android:gravity="center"
-        android:paddingHorizontal="20dp"
-        android:text="@string/error_tvsubtitle"
-        android:textColor="@color/dark_blue"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ltError" />
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/error_tvtitle"
+                android:textColor="@color/dark_blue"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toTopOf="@+id/ltError"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Botão de Retry -->
-    <Button
-        android:id="@+id/btnRetry"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/error_btnretry"
-        android:minWidth="200dp"
-        android:textSize="16sp"
-        android:textColor="@android:color/white"
-        android:backgroundTint="@color/red_300"
-        app:elevation="30dp"
-        android:textAllCaps="false"
-        android:fontFamily="@font/plus_jakarta_sans"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSubtitle"
-        android:layout_marginTop="16dp" />
+            <ImageView
+                android:id="@+id/ltError"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/cat_404"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/tvSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:text="@string/error_tvsubtitle"
+                android:textColor="@color/dark_blue"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ltError" />
+
+            <!-- Botão de Retry -->
+            <Button
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/red_300"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:minWidth="200dp"
+                android:text="@string/error_btnretry"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                app:elevation="30dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvSubtitle" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
