@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.lottie)
     implementation(libs.android.utils)
+    implementation(libs.androidx.swiperefreshlayout)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

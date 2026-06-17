@@ -38,8 +38,14 @@ class HomeFragment : Fragment() {
         binding.recyclerViewHome.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.recyclerViewHome.adapter = adapter
 
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.loadCats()
+            binding.swipeRefresh.isRefreshing = false
+        }
+
         viewModel.cats.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
+            binding.swipeRefresh.isRefreshing = false
         }
     }
 
