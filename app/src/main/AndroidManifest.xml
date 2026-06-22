@@ -12,7 +12,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_cat"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CatImageList" >
+        android:theme="@style/Theme.CatImageList"
+        android:name=".di.CatApplication">
         <activity
             android:name=".ui.catlist.CatListActivity"
             android:exported="false"

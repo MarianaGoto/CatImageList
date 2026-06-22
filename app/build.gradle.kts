@@ -9,6 +9,7 @@ val localProperties = Properties()
 localProperties.load(rootProject.file("local.properties").inputStream())
 
 val apiKey = localProperties.getProperty("API_KEY") ?: ""
+val subId = localProperties.getProperty("SUB_ID") ?: ""
 
 android {
     namespace = "com.marianagoto.catimagelist"
@@ -24,10 +25,17 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
         buildConfigField(
             "String",
             "API_KEY",
             "\"$apiKey\""
+        )
+
+        buildConfigField(
+            "String",
+            "SUB_ID",
+            "\"$subId\""
         )
     }
 
@@ -75,6 +83,7 @@ dependencies {
     implementation(libs.lottie)
     implementation(libs.android.utils)
     implementation(libs.androidx.swiperefreshlayout)
+    implementation(libs.koin)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
