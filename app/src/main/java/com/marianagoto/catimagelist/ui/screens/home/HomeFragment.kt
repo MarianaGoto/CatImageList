@@ -49,6 +49,10 @@ class HomeFragment : Fragment() {
         }
 
         setupObservables()
+
+        binding.errorLayout.btnRetry.setOnClickListener{
+            viewModel.getCats()
+        }
     }
 
     override fun onResume() {

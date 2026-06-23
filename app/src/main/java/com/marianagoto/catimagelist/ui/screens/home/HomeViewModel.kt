@@ -19,6 +19,9 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
 
     fun getCats() {
         viewModelScope.launch {
+            // Carregando lista de gatos - usado para erro de conexão
+            _cats.value = UIState.Loading
+
             repository.getCatsList(limit = 20)
                 .onSuccess { catList ->
                     _cats.value = UIState.Success(catList)

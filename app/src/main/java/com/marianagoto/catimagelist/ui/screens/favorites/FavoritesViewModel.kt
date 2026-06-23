@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.data.repository.CatRepository
 import com.marianagoto.catimagelist.domain.model.CatImage
-import com.marianagoto.catimagelist.domain.model.FavoriteResponseList
 import com.marianagoto.catimagelist.ui.helpers.UIState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -20,6 +19,8 @@ class FavoritesViewModel(private val repository: CatRepository) : ViewModel(){
 
     fun getFavoriteCats() {
         viewModelScope.launch {
+            // Carregando o gato favorito - usado para erro de conexão
+            _cats.value = UIState.Loading
 
             val result = repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
             result.fold(

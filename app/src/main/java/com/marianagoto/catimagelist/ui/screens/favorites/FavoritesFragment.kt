@@ -48,6 +48,10 @@ class FavoritesFragment : Fragment() {
         binding.recyclerViewFavorites.adapter = adapter
 
         setupObservables()
+
+        binding.errorLayout.btnRetry.setOnClickListener{
+            viewModel.getFavoriteCats()
+        }
     }
 
     private fun setupObservables(){
@@ -73,6 +77,7 @@ class FavoritesFragment : Fragment() {
                 }
             }
         }
+
     }
 
     override fun onResume() {
