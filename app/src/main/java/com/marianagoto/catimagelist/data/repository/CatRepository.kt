@@ -3,6 +3,9 @@ package com.marianagoto.catimagelist.data.repository
 import com.marianagoto.catimagelist.data.network.RetrofitClient
 import com.marianagoto.catimagelist.data.remote.api.CatApiService
 import com.marianagoto.catimagelist.domain.model.CatImage
+import com.marianagoto.catimagelist.domain.model.FavoriteRequest
+import com.marianagoto.catimagelist.domain.model.FavoriteResponseAdd
+import com.marianagoto.catimagelist.domain.model.FavoriteResponseList
 
 class CatRepository(
     private val apiService: CatApiService = RetrofitClient.service
@@ -36,6 +39,30 @@ class CatRepository(
         return try {
             val cat = apiService.searchCatById(id)
             Result.success(cat)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    //addFavoriteCat
+
+    suspend fun addFavoriteCat(favoriteRequest: FavoriteRequest, apiKey: String): Result<FavoriteResponseAdd>{
+        return try {
+            // 1. Buscar lista básica de gatos
+            val catFavorite = apiService.addFavoriteCatById(favoriteRequest = favoriteRequest, apiKey = apiKey)
+
+            Result.success(catFavorite)
+
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    //searchFavoriteCats
+    suspend fun getFavoriteCatsList(apiKey: String): Result<List<FavoriteResponseList>> {
+        return try {
+            val catFavoriteList = apiService.searchFavoriteCats(apiKey = apiKey)
+            Result.success(catFavoriteList)
         } catch (e: Exception) {
             Result.failure(e)
         }

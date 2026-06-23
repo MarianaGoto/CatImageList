@@ -5,8 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.data.repository.CatRepository
 import com.marianagoto.catimagelist.domain.model.CatImage
+import com.marianagoto.catimagelist.domain.model.FavoriteRequest
+import com.marianagoto.catimagelist.domain.model.FavoriteResponseList
 import com.marianagoto.catimagelist.ui.catlist.CatUiState
 import kotlinx.coroutines.launch
 
@@ -25,45 +28,61 @@ class CatViewModel(
     private val _favorites = MutableLiveData<List<CatImage>>(emptyList())
     val favorites: LiveData<List<CatImage>> = _favorites
 
-    init {
-        loadCats()
-    }
+    private val _catsFavorite = MutableLiveData<List<FavoriteResponseList>>(emptyList())
+    val catsFavorite: LiveData<List<FavoriteResponseList>> = _catsFavorite
 
-    fun loadCats() {
-        viewModelScope.launch {
-            _uiState.value = CatUiState.Loading
+//    init {
+//        loadCats()
+//    }
 
-            repository.getCatsList(limit = 20)
-                .onSuccess { catList ->
-                    _cats.value = catList
-                    _uiState.value = CatUiState.Success(catList)
-
-                    updateFavorites(catList)
-
-                    logCatDetails(catList)
-                    updateFavoriteState()
-                }.onFailure { error ->
-                    val errorMessage = getErrorMessage(error)
-                    Log.e("CatViewModel", "Erro ao carregar gatos: $errorMessage", error)
-                    _uiState.value = CatUiState.Error(errorMessage)
-                }
-        }
-    }
+//    fun loadCats() {
+//        viewModelScope.launch {
+//            _uiState.value = CatUiState.Loading
+//
+//            repository.getCatsList(limit = 20)
+//                .onSuccess { catList ->
+//                    _cats.value = catList
+//                    _uiState.value = CatUiState.Success(catList)
+//
+//                    updateFavorites(catList)
+//
+//                    logCatDetails(catList)
+//                    updateFavoriteState()
+//                }.onFailure { error ->
+//                    val errorMessage = getErrorMessage(error)
+//                    Log.e("CatViewModel", "Erro ao carregar gatos: $errorMessage", error)
+//                    _uiState.value = CatUiState.Error(errorMessage)
+//                }
+//        }
+//    }
 
     //  * Alternar o status de favorito de um gato.
-    fun toggleFavorite(cat: CatImage) {
-        val currentList = _cats.value.orEmpty()
-        val updatedList = currentList.map {
-            if (it.id == cat.id) {
-                it.copy(isFavorite = !it.isFavorite)
-            } else {
-                it
-            }
-        }
-        _cats.value = updatedList
-        updateFavorites(updatedList)
-        updateFavoriteState()
-    }
+//      fun toggleFavorite(imageId: String, subId: String) {
+//
+//        val favoriteRequest = FavoriteRequest(imageId = imageId, subId = subId)
+//
+//        viewModelScope.launch {
+//            _uiState.value = CatUiState.Loading
+//
+////resolver problema do loading infinito ao adicionar o gato
+//            val result = repository.addFavoriteCat(
+//                favoriteRequest = favoriteRequest, apiKey = BuildConfig.API_KEY
+//            )
+//            result.fold(
+//                onSuccess = {
+//                    Log.d("CatViewModel", "gatinho favoritado!")
+//
+//                    _uiState.value = CatUiState.Favoritado
+//
+//                },
+//                onFailure = { error ->
+//                    val msg = error.localizedMessage ?: "Erro desconhecido"
+//                    Log.e("CatViewModel", "Erro ao adicionar favorito: $msg", error)
+//                    _uiState.value = CatUiState.Error(msg)
+//                }
+//            )
+//        }
+//    }
 
     private fun updateFavorites(list: List<CatImage>){
         val favoritesList = list.filter {it.isFavorite}
@@ -72,8 +91,31 @@ class CatViewModel(
 
 
     //    * Retorna a lista de gatos favoritos.
-    fun getFavorites(): List<CatImage> {
-        return _cats.value?.filter { it.isFavorite } ?: emptyList()
+//    fun getFavorites(): List<CatImage> {
+//        return _cats.value?.filter { it.isFavorite } ?: emptyList()
+//    }
+
+    fun getFavorites() {
+        viewModelScope.launch {
+            _uiState.value = CatUiState.Loading
+
+            val result = repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
+            result.fold(
+                onSuccess = { catList ->
+                    _catsFavorite.value = catList
+                    _uiState.value = CatUiState.SucessoFavoritado(catList)
+                    Log.d("CatViewModel", "gatinho listado <3")
+
+
+
+                },
+                onFailure = { error ->
+                    val msg = error.localizedMessage ?: "Erro desconhecido"
+                    Log.e("CatViewModel", "Erro ao listar o gato favorito: $msg", error)
+                    _uiState.value = CatUiState.Error(msg)
+                }
+            )
+        }
     }
 
     //  * Atualiza o estado _hasNoFavorites com base na lista atual.

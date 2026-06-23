@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.marianagoto.catimagelist.databinding.ActivityMainBinding
 import com.marianagoto.catimagelist.di.CatViewModelFactory
@@ -15,13 +16,15 @@ import com.marianagoto.catimagelist.ui.catlist.CatUiState
 import com.marianagoto.catimagelist.ui.viewmodel.CatViewModel
 import com.marianagoto.catimagelist.util.AnimationUtils
 import com.marianagoto.catimagelist.ErrorFragment
+import com.marianagoto.catimagelist.ui.helpers.UIState
+import com.marianagoto.catimagelist.ui.screens.favorites.FavoritesFragment
+import com.marianagoto.catimagelist.ui.screens.home.HomeFragment
+import com.marianagoto.catimagelist.ui.screens.home.HomeViewModel
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: CatViewModel by viewModels { CatViewModelFactory() }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,42 +35,16 @@ class MainActivity : AppCompatActivity() {
 
         binding.main
 
-        viewModel.uiState.observe(this) { state ->
-            when (state) {
-                is CatUiState.Loading -> {
-                    // Só abre LoadingFragment se NÃO for atualização de favorito
-                    val isNotManualUpdate = true
-                    if (isNotManualUpdate) {
-                        openFragment(LoadingFragment())
-                    }
-                }
-
-                is CatUiState.Success -> {
-                    // Só abre HomeFragment se veio de Loading/Error/Não estiver em outro fragment
-                    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
-                    if (currentFragment !is HomeFragment &&
-                        currentFragment !is FavoritesFragment &&
-                        currentFragment !is EmptyFavoritesFragment &&
-                        currentFragment !is ErrorFragment) {
-                        openFragment(HomeFragment())
-                    }
-                }
-
-                is CatUiState.Error -> {
-                    Log.e("MainActivity", "Erro ao carregar gatos: ${state.message}")
-                    openFragment(ErrorFragment())
-                }
-            }
+        if (savedInstanceState == null) {
+            openFragment(HomeFragment())
         }
+
 
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.menu_home -> {
                     Log.d("Animation", "Clicou em Home - ID: ${item.itemId}")
                     animateIconOnly(R.id.menu_home)
-                    if (viewModel.uiState.value is CatUiState.Error) {
-                        viewModel.loadCats()
-                    }
                     openFragment(HomeFragment())
                     true
                 }
@@ -75,12 +52,13 @@ class MainActivity : AppCompatActivity() {
                 R.id.menu_favorites -> {
                     Log.d("Animation", "Clicou em Favoritos - ID: ${item.itemId}")
                     animateIconOnly(R.id.menu_favorites)
-                    val favorites = viewModel.getFavorites()
-                    if (favorites.isEmpty()) {
-                        openFragment(EmptyFavoritesFragment())
-                    } else {
-                        openFragment(FavoritesFragment())
-                    }
+                    openFragment(FavoritesFragment())
+//                    val favorites = viewModel.getFavorites()
+//                    if (favorites.isEmpty()) {
+//                        openFragment(EmptyFavoritesFragment())
+//                    } else {
+//                        openFragment(FavoritesFragment())
+//                    }
                     true
                 }
 
