@@ -5,13 +5,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.marianagoto.catimagelist.R
 import com.marianagoto.catimagelist.databinding.FragmentFavoritesBinding
 import com.marianagoto.catimagelist.domain.model.CatImage
 import com.marianagoto.catimagelist.ui.catlist.CatAdapter
 import com.marianagoto.catimagelist.ui.helpers.UIState
+import com.marianagoto.catimagelist.ui.screens.home.HomeFragment
 import com.marianagoto.catimagelist.ui.screens.home.HomeViewModel
 import com.marianagoto.catimagelist.ui.viewmodel.CatViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -81,8 +85,21 @@ class FavoritesFragment : Fragment() {
             }
         }
         viewModel.snackbarMessage.observe(viewLifecycleOwner) { message ->
-            android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
+            showCustomToast(message)
         }
+    }
+
+    fun FavoritesFragment.showCustomToast(message: String) {
+        val inflater = LayoutInflater.from(requireContext())
+        val layout = inflater.inflate(R.layout.custom_toast, null)
+
+        val textView = layout.findViewById<TextView>(R.id.tvMessage)
+        textView.text = message
+
+        Toast(requireContext()).apply{
+            duration = Toast.LENGTH_SHORT
+            view = layout
+        }.show()
     }
 
     override fun onResume() {

@@ -58,7 +58,8 @@ class FavoritesViewModel(private val repository: CatRepository) : ViewModel(){
             result.fold(
                 onSuccess = { catList ->
                     Log.d("FavoritesViewModel", "Deletado com sucesso ID: $favouriteId")
-                    _snackbarMessage.value = "Removido dos favoritos!"
+                    getFavoriteCats()
+                    _snackbarMessage.value = "Removido dos favoritos"
 
                 },
                 onFailure = { error ->

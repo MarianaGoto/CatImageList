@@ -17,6 +17,9 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
     private val _cats = MutableLiveData<UIState<List<CatImage>>>(UIState.Loading)
     val cats: LiveData<UIState<List<CatImage>>> = _cats
 
+    private val _snackbarMessage = MutableLiveData<String>()
+    val snackbarMessage: LiveData<String> = _snackbarMessage
+
     fun getCats() {
         viewModelScope.launch {
             // Carregando lista de gatos - usado para erro de conexão
@@ -47,6 +50,7 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
             result.fold(
                 onSuccess = {
                     Log.d("CatViewModel", "gatinho favoritado!")
+                    _snackbarMessage.value = "Adicionado aos favoritos"
                 },
                 onFailure = { error ->
                     val msg = error.localizedMessage ?: "Erro desconhecido"

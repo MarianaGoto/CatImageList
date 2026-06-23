@@ -1,12 +1,16 @@
 package com.marianagoto.catimagelist.ui.screens.home
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.marianagoto.catimagelist.BuildConfig
+import com.marianagoto.catimagelist.R
 import com.marianagoto.catimagelist.databinding.FragmentHomeBinding
 import com.marianagoto.catimagelist.ui.catlist.CatAdapter
 import com.marianagoto.catimagelist.ui.helpers.UIState
@@ -81,7 +85,23 @@ class HomeFragment : Fragment() {
                     adapter.submitList(uiState.data)
                 }
             }
+            viewModel.snackbarMessage.observe(viewLifecycleOwner) { message ->
+                showCustomToast(message)
+            }
         }
+    }
+
+    fun HomeFragment.showCustomToast(message: String) {
+        val inflater = LayoutInflater.from(requireContext())
+        val layout = inflater.inflate(R.layout.custom_toast, null)
+
+        val textView = layout.findViewById<TextView>(R.id.tvMessage)
+        textView.text = message
+
+        Toast(requireContext()).apply{
+            duration = Toast.LENGTH_SHORT
+            view = layout
+        }.show()
     }
 
     override fun onDestroyView() {
