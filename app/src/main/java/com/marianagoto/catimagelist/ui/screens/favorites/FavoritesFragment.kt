@@ -1,6 +1,7 @@
 package com.marianagoto.catimagelist.ui.screens.favorites
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,10 +39,12 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = CatAdapter {
-            viewModel.getFavoriteCats()
-//            viewModel.toggleFavorite(imageId = cat.id, subId = BuildConfig.SUB_ID)
-//            chamar a função de delete do gato de favoritos
+        adapter = CatAdapter { cat ->
+            Log.d("CatAdapter","favoriteid: ${cat.favoriteId}")
+
+            cat.favoriteId?.let{ id ->
+                viewModel.removeFavoriteCat(id)
+            }
         }
 
         binding.recyclerViewFavorites.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -77,7 +80,9 @@ class FavoritesFragment : Fragment() {
                 }
             }
         }
-
+        viewModel.snackbarMessage.observe(viewLifecycleOwner) { message ->
+            android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onResume() {

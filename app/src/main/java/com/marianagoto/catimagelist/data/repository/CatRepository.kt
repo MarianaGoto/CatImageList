@@ -6,6 +6,7 @@ import com.marianagoto.catimagelist.domain.model.CatImage
 import com.marianagoto.catimagelist.domain.model.FavoriteRequest
 import com.marianagoto.catimagelist.domain.model.FavoriteResponseAdd
 import com.marianagoto.catimagelist.domain.model.FavoriteResponseList
+import retrofit2.Response
 
 class CatRepository(
     private val apiService: CatApiService = RetrofitClient.service
@@ -62,6 +63,16 @@ class CatRepository(
     suspend fun getFavoriteCatsList(apiKey: String): Result<List<FavoriteResponseList>> {
         return try {
             val catFavoriteList = apiService.searchFavoriteCats(apiKey = apiKey)
+            Result.success(catFavoriteList)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    //removeFavoriteCatById
+    suspend fun removeFavoriteCat(favouriteId: Int, apiKey: String):  Result<Response<Unit>>{
+        return try {
+            val catFavoriteList = apiService.removeFavoriteCatById(favouriteId = favouriteId, apiKey = apiKey)
             Result.success(catFavoriteList)
         } catch (e: Exception) {
             Result.failure(e)

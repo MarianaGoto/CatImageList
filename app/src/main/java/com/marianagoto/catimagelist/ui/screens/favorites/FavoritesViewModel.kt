@@ -17,6 +17,10 @@ class FavoritesViewModel(private val repository: CatRepository) : ViewModel(){
     private val _cats = MutableLiveData<UIState<List<CatImage>>>(UIState.Loading)
     val cats: LiveData<UIState<List<CatImage>>> = _cats
 
+    private val _snackbarMessage = MutableLiveData<String>()
+    val snackbarMessage: LiveData<String> = _snackbarMessage
+
+
     fun getFavoriteCats() {
         viewModelScope.launch {
             // Carregando o gato favorito - usado para erro de conexão
@@ -25,23 +29,41 @@ class FavoritesViewModel(private val repository: CatRepository) : ViewModel(){
             val result = repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
             result.fold(
                 onSuccess = { catList ->
-                    /*teste datalhes gato favorito*/
                     val detailedCats = catList.map{ catFav ->
                         async{
-                            repository.getCatById(catFav.imageId).getOrNull()
+                            val detail = repository.getCatById(catFav.imageId).getOrNull()
+                            detail?.copy(
+                                isFavorite = true,
+                                favoriteId = catFav.id
+                            )
                         }
                     }.awaitAll()
-                    val finalList = detailedCats.filterNotNull().map{
-                        it.copy(isFavorite = true)
-                    }
 
-                    _cats.value = UIState.Success(finalList)
+                    _cats.value = UIState.Success(detailedCats.filterNotNull())
                     Log.d("CatViewModel", "gatinho listado <3")
                 },
                 onFailure = { error ->
                     val msg = error.localizedMessage ?: "Erro desconhecido"
                     Log.e("CatViewModel", "Erro ao listar o gato favorito: $msg", error)
                     _cats.value = UIState.Error
+                }
+            )
+        }
+    }
+
+    fun removeFavoriteCat(favouriteId: Int) {
+        viewModelScope.launch {
+            val result = repository.removeFavoriteCat(favouriteId = favouriteId, apiKey = BuildConfig.API_KEY)
+
+            result.fold(
+                onSuccess = { catList ->
+                    Log.d("FavoritesViewModel", "Deletado com sucesso ID: $favouriteId")
+                    _snackbarMessage.value = "Removido dos favoritos!"
+
+                },
+                onFailure = { error ->
+                    val msg = error.localizedMessage ?: "Erro ao remover"
+                    Log.e("FavoritesViewModel", "Falha ao remover favorito: $msg")
                 }
             )
         }

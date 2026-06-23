@@ -5,7 +5,9 @@ import com.marianagoto.catimagelist.domain.model.CatImage
 import com.marianagoto.catimagelist.domain.model.FavoriteRequest
 import com.marianagoto.catimagelist.domain.model.FavoriteResponseAdd
 import com.marianagoto.catimagelist.domain.model.FavoriteResponseList
+import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -33,4 +35,10 @@ interface CatApiService {
 
     @GET("favourites")
     suspend fun searchFavoriteCats(@Header("x-api-key") apiKey: String): List<FavoriteResponseList>
+
+    @DELETE("favourites/{favourite_id}")
+    suspend fun removeFavoriteCatById(
+        @Path("favourite_id") favouriteId: Int,
+        @Header("x-api-key") apiKey: String
+    ): Response<Unit>
 }

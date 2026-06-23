@@ -8,7 +8,8 @@ data class CatImage(
     val width: Int? = null,
     val height: Int? = null,
     var isFavorite: Boolean = false,
-    val breeds: List<Breed>? = null
+    val breeds: List<Breed>? = null,
+    val favoriteId: Int? = null
 )
 
 data class Breed(
