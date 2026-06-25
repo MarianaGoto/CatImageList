@@ -17,8 +17,8 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
     private val _cats = MutableLiveData<UIState<List<CatImage>>>(UIState.Loading)
     val cats: LiveData<UIState<List<CatImage>>> = _cats
 
-    private val _snackbarMessage = MutableLiveData<String>()
-    val snackbarMessage: LiveData<String> = _snackbarMessage
+    private val _snackbarMessage = MutableLiveData<CatImage>()
+    val snackbarMessage: LiveData<CatImage> = _snackbarMessage
 
     fun getCats() {
         viewModelScope.launch {
@@ -39,9 +39,9 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
     }
 
 //      * Alternar o status de favorito de um gato.
-      fun toggleFavorite(imageId: String, subId: String) {
+      fun toggleFavorite(cat: CatImage, subId: String) {
 
-        val favoriteRequest = FavoriteRequest(imageId = imageId, subId = subId)
+        val favoriteRequest = FavoriteRequest(imageId = cat.id, subId = subId)
 
         viewModelScope.launch {
             val result = repository.addFavoriteCat(
@@ -50,7 +50,7 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
             result.fold(
                 onSuccess = {
                     Log.d("CatViewModel", "gatinho favoritado!")
-                    _snackbarMessage.value = "Adicionado aos favoritos"
+                    _snackbarMessage.value = cat
                 },
                 onFailure = { error ->
                     val msg = error.localizedMessage ?: "Erro desconhecido"

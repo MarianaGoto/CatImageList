@@ -51,9 +51,7 @@ class CatRepository(
         return try {
             // 1. Buscar lista básica de gatos
             val catFavorite = apiService.addFavoriteCatById(favoriteRequest = favoriteRequest, apiKey = apiKey)
-
             Result.success(catFavorite)
-
         } catch (e: Exception) {
             Result.failure(e)
         }

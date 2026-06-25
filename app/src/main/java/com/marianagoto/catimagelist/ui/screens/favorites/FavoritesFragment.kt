@@ -14,6 +14,7 @@ import com.marianagoto.catimagelist.R
 import com.marianagoto.catimagelist.databinding.FragmentFavoritesBinding
 import com.marianagoto.catimagelist.domain.model.CatImage
 import com.marianagoto.catimagelist.ui.catlist.CatAdapter
+import com.marianagoto.catimagelist.ui.helpers.ToastHelper.showToast
 import com.marianagoto.catimagelist.ui.helpers.UIState
 import com.marianagoto.catimagelist.ui.screens.home.HomeFragment
 import com.marianagoto.catimagelist.ui.screens.home.HomeViewModel
@@ -84,22 +85,9 @@ class FavoritesFragment : Fragment() {
                 }
             }
         }
-        viewModel.snackbarMessage.observe(viewLifecycleOwner) { message ->
-            showCustomToast(message)
-        }
-    }
-
-    fun FavoritesFragment.showCustomToast(message: String) {
-        val inflater = LayoutInflater.from(requireContext())
-        val layout = inflater.inflate(R.layout.custom_toast, null)
-
-        val textView = layout.findViewById<TextView>(R.id.tvMessage)
-        textView.text = message
-
-        Toast(requireContext()).apply{
-            duration = Toast.LENGTH_SHORT
-            view = layout
-        }.show()
+//        viewModel.snackbarMessage.observe(viewLifecycleOwner) { message ->
+//            showToast(context = requireContext(),message = message)
+//        }
     }
 
     override fun onResume() {

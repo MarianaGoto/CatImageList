@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.android.utils)
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.koin)
+    implementation(libs.androidx.material3)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
