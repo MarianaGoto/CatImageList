@@ -15,11 +15,13 @@ import kotlinx.coroutines.launch
 
 
 class HomeViewModel(private val repository: CatRepository) : ViewModel() {
-    private val _cats = MutableLiveData<UIState<List<CatImageVO>>>(UIState.Loading)
+    private val _cats = MutableLiveData<UIState<List<CatImageVO>>>()
     val cats: LiveData<UIState<List<CatImageVO>>> = _cats
 
-    private val _snackbarMessage = MutableLiveData<CatImageVO>()
-    val snackbarMessage: LiveData<CatImageVO> = _snackbarMessage
+    private val _favoriteBreedName = MutableLiveData<String>()
+    val favoriteBreedName: LiveData<String> = _favoriteBreedName
+
+
 
     fun getCats() {
         viewModelScope.launch {
@@ -41,9 +43,9 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
     }
 
 //      * Alternar o status de favorito de um gato.
-      fun toggleFavorite(catId: String, subId: String) {
+      fun toggleFavorite(cat: CatImageVO, subId: String) {
 
-        val favoriteRequest = FavoriteRequest(imageId = catId, subId = subId)
+        val favoriteRequest = FavoriteRequest(imageId = cat.id, subId = subId)
 
         viewModelScope.launch {
             val result = repository.addFavoriteCat(
@@ -55,22 +57,21 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
 
 //                    cat.favoriteId = response.id
 //                    cat.isFavorite = true
-//                    _snackbarMessage.value = cat
+                    _favoriteBreedName.postValue(cat.breeds.firstOrNull()?.name ?: "Sem raça definida")
                 },
                 onFailure = { error ->
                     val msg = error.localizedMessage ?: "Erro desconhecido"
                     Log.e("CatViewModel", "Erro ao adicionar favorito: $msg", error)
 
 //                    cat.isFavorite = false
-                    _snackbarMessage.value = null
                     _cats.value = UIState.Error
                 }
             )
         }
     }
 
-    fun resetSnackbarMessage() {
-        _snackbarMessage.value = null
+    fun resetFavoriteBreedName() {
+        _favoriteBreedName.value = null
     }
 
     fun removeFavoriteCat(favouriteId: Int) {

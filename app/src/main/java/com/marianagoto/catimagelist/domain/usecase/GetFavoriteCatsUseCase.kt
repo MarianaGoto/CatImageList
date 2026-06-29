@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flow
 import kotlin.collections.filterNotNull
 
 class GetFavoriteCatsUseCase(private val repository: CatRepository) {
-    fun getFavoriteRichCats(): Flow<List<FavoriteRichResponse>> = flow {
+    fun getFavoriteRichCats():  Flow<List<FavoriteRichResponse>> = flow {
         // 1. Busca a lista de favoritos inicial
         val favoritesResult = repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
 

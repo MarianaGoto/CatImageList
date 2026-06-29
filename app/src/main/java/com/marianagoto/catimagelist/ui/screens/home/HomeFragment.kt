@@ -36,7 +36,7 @@ class HomeFragment : Fragment() {
 
         adapter = HomeCatAdapter { cat ->
             if(cat.isFavorite){
-                viewModel.toggleFavorite(catId = cat.id, subId = BuildConfig.SUB_ID)
+                viewModel.toggleFavorite(cat = cat, subId = BuildConfig.SUB_ID)
             } else {
 //                cat.favoriteId?.let{ id ->
 //                    viewModel.removeFavoriteCat(id)
@@ -94,11 +94,11 @@ class HomeFragment : Fragment() {
                     adapter.submitList(uiState.data)
                 }
             }
-            viewModel.snackbarMessage.observe(viewLifecycleOwner) { cat ->
-                if (cat != null) {
-                    ShowCustomSnackbar(view = binding.root, cat = cat)
-                    viewModel.resetSnackbarMessage()
-                }
+        }
+
+        viewModel.favoriteBreedName.observe(viewLifecycleOwner) { favoriteBreedName ->
+            if (favoriteBreedName != null) {
+                ShowCustomSnackbar(view = binding.root, breedName = favoriteBreedName)
             }
         }
     }

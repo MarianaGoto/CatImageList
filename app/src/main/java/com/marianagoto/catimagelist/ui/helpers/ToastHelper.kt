@@ -40,11 +40,10 @@ object ToastHelper {
     }
 
     @SuppressLint("RestrictedApi")
-    fun ShowCustomSnackbar(view: View, cat: CatImageVO) {
+    fun ShowCustomSnackbar(view: View, breedName: String) {
         val snackbar = Snackbar.make(view, "", Snackbar.LENGTH_SHORT)
         val inflater = LayoutInflater.from(view.context)
         val snackBinding = CustomToastBinding.inflate(inflater)
-        val breedName = cat.breeds.firstOrNull()?.name ?: "Gatinho"
         snackBinding.tvBreed.text = breedName
         val snackbarLayout = snackbar.view as Snackbar.SnackbarLayout
 
