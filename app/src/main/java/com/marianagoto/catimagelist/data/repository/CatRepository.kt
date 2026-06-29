@@ -1,20 +1,20 @@
 package com.marianagoto.catimagelist.data.repository
 
+import com.marianagoto.catimagelist.data.dto.CatImageResponse
+import com.marianagoto.catimagelist.data.dto.FavoriteAddResponse
+import com.marianagoto.catimagelist.data.dto.FavoriteRequest
+import com.marianagoto.catimagelist.data.dto.FavoriteResponse
 import com.marianagoto.catimagelist.data.network.RetrofitClient
 import com.marianagoto.catimagelist.data.remote.api.CatApiService
-import com.marianagoto.catimagelist.domain.model.CatImage
-import com.marianagoto.catimagelist.domain.model.FavoriteRequest
-import com.marianagoto.catimagelist.domain.model.FavoriteResponseAdd
-import com.marianagoto.catimagelist.domain.model.FavoriteResponseList
 import retrofit2.Response
 
 class CatRepository(
     private val apiService: CatApiService = RetrofitClient.service
 ) {
-    suspend fun getCatsList(limit: Int = 20): Result<List<CatImage>> {
+    suspend fun getCatsList(limit: Int = 20): Result<List<CatImageResponse>> {
         return try {
             // 1. Buscar lista básica de gatos
-            val cats = apiService.searchCats(limit = limit, hasBreeds = 1)
+            val cats = apiService.searchCats(limit = limit, hasBreeds = true)
 
             // 2. Detalhes de cada gato
             val detailedCats = cats.map { cat ->
@@ -28,7 +28,7 @@ class CatRepository(
         }
     }
 
-    private suspend fun getCatDetails(cat: CatImage): CatImage {
+    private suspend fun getCatDetails(cat: CatImageResponse): CatImageResponse {
         return try {
             apiService.searchCatById(cat.id)
         } catch (e: Exception) {
@@ -36,7 +36,7 @@ class CatRepository(
         }
     }
 
-    suspend fun getCatById(id: String): Result<CatImage> {
+    suspend fun getCatById(id: String): Result<CatImageResponse> {
         return try {
             val cat = apiService.searchCatById(id)
             Result.success(cat)
@@ -47,7 +47,7 @@ class CatRepository(
 
     //addFavoriteCat
 
-    suspend fun addFavoriteCat(favoriteRequest: FavoriteRequest, apiKey: String): Result<FavoriteResponseAdd>{
+    suspend fun addFavoriteCat(favoriteRequest: FavoriteRequest, apiKey: String): Result<FavoriteAddResponse>{
         return try {
             // 1. Buscar lista básica de gatos
             val catFavorite = apiService.addFavoriteCatById(favoriteRequest = favoriteRequest, apiKey = apiKey)
@@ -58,7 +58,7 @@ class CatRepository(
     }
 
     //searchFavoriteCats
-    suspend fun getFavoriteCatsList(apiKey: String): Result<List<FavoriteResponseList>> {
+    suspend fun getFavoriteCatsList(apiKey: String): Result<List<FavoriteResponse>> {
         return try {
             val catFavoriteList = apiService.searchFavoriteCats(apiKey = apiKey)
             Result.success(catFavoriteList)

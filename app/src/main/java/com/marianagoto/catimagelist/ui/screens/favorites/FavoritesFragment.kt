@@ -5,27 +5,19 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import com.marianagoto.catimagelist.R
 import com.marianagoto.catimagelist.databinding.FragmentFavoritesBinding
-import com.marianagoto.catimagelist.domain.model.CatImage
-import com.marianagoto.catimagelist.ui.catlist.CatAdapter
-import com.marianagoto.catimagelist.ui.helpers.ToastHelper.showToast
+import com.marianagoto.catimagelist.ui.catlist.FavoriteCatAdapter
+import com.marianagoto.catimagelist.ui.catlist.HomeCatAdapter
 import com.marianagoto.catimagelist.ui.helpers.UIState
-import com.marianagoto.catimagelist.ui.screens.home.HomeFragment
-import com.marianagoto.catimagelist.ui.screens.home.HomeViewModel
-import com.marianagoto.catimagelist.ui.viewmodel.CatViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
 class FavoritesFragment : Fragment() {
     private var _binding: FragmentFavoritesBinding? = null
     private val binding get() = _binding!!
-    private lateinit var adapter: CatAdapter
+    private lateinit var adapter: FavoriteCatAdapter
 
     private val viewModel: FavoritesViewModel by viewModel()
 
@@ -44,7 +36,7 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = CatAdapter { cat ->
+        adapter = FavoriteCatAdapter { cat ->
             Log.d("CatAdapter","favoriteid: ${cat.favoriteId}")
 
             cat.favoriteId?.let{ id ->

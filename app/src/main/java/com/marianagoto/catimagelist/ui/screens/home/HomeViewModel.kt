@@ -6,19 +6,20 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.marianagoto.catimagelist.BuildConfig
+import com.marianagoto.catimagelist.data.dto.FavoriteRequest
 import com.marianagoto.catimagelist.data.repository.CatRepository
-import com.marianagoto.catimagelist.domain.model.CatImage
-import com.marianagoto.catimagelist.domain.model.FavoriteRequest
+import com.marianagoto.catimagelist.domain.mapper.catImageDTOToVO
 import com.marianagoto.catimagelist.ui.helpers.UIState
+import com.marianagoto.catimagelist.ui.vo.CatImageVO
 import kotlinx.coroutines.launch
 
 
 class HomeViewModel(private val repository: CatRepository) : ViewModel() {
-    private val _cats = MutableLiveData<UIState<List<CatImage>>>(UIState.Loading)
-    val cats: LiveData<UIState<List<CatImage>>> = _cats
+    private val _cats = MutableLiveData<UIState<List<CatImageVO>>>(UIState.Loading)
+    val cats: LiveData<UIState<List<CatImageVO>>> = _cats
 
-    private val _snackbarMessage = MutableLiveData<CatImage>()
-    val snackbarMessage: LiveData<CatImage> = _snackbarMessage
+    private val _snackbarMessage = MutableLiveData<CatImageVO>()
+    val snackbarMessage: LiveData<CatImageVO> = _snackbarMessage
 
     fun getCats() {
         viewModelScope.launch {
@@ -26,9 +27,10 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
             _cats.value = UIState.Loading
 
             repository.getCatsList(limit = 20)
-                .onSuccess { catList ->
-                    _cats.value = UIState.Success(catList)
-                    logCatDetails(catList)
+                .onSuccess { catListResponse ->
+                    val catListVO = catImageDTOToVO(catListResponse)
+                    _cats.value = UIState.Success(catListVO)
+                    logCatDetails(catListVO)
 
                 }.onFailure { error ->
                     val errorMessage = getErrorMessage(error)
@@ -39,31 +41,60 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
     }
 
 //      * Alternar o status de favorito de um gato.
-      fun toggleFavorite(cat: CatImage, subId: String) {
+      fun toggleFavorite(catId: String, subId: String) {
 
-        val favoriteRequest = FavoriteRequest(imageId = cat.id, subId = subId)
+        val favoriteRequest = FavoriteRequest(imageId = catId, subId = subId)
 
         viewModelScope.launch {
             val result = repository.addFavoriteCat(
                 favoriteRequest = favoriteRequest, apiKey = BuildConfig.API_KEY
             )
             result.fold(
-                onSuccess = {
+                onSuccess = { response ->
                     Log.d("CatViewModel", "gatinho favoritado!")
-                    _snackbarMessage.value = cat
+
+//                    cat.favoriteId = response.id
+//                    cat.isFavorite = true
+//                    _snackbarMessage.value = cat
                 },
                 onFailure = { error ->
                     val msg = error.localizedMessage ?: "Erro desconhecido"
                     Log.e("CatViewModel", "Erro ao adicionar favorito: $msg", error)
+
+//                    cat.isFavorite = false
+                    _snackbarMessage.value = null
                     _cats.value = UIState.Error
                 }
             )
         }
     }
 
-    private fun logCatDetails(cats: List<CatImage>) {
+    fun resetSnackbarMessage() {
+        _snackbarMessage.value = null
+    }
+
+    fun removeFavoriteCat(favouriteId: Int) {
+        viewModelScope.launch {
+            val result = repository.removeFavoriteCat(favouriteId = favouriteId, apiKey = BuildConfig.API_KEY)
+
+            result.fold(
+                onSuccess = { catList ->
+                    Log.d("FavoritesViewModel", "Deletado com sucesso ID: $favouriteId")
+
+//                    _snackbarMessage.value = "Removido dos favoritos"
+
+                },
+                onFailure = { error ->
+                    val msg = error.localizedMessage ?: "Erro ao remover"
+                    Log.e("FavoritesViewModel", "Falha ao remover favorito: $msg")
+                }
+            )
+        }
+    }
+
+    private fun logCatDetails(cats: List<CatImageVO>) {
         cats.forEach { cat ->
-            val breed = cat.breeds?.firstOrNull()
+            val breed = cat.breeds.firstOrNull()
             val breedName = breed?.name ?: "Unknown"
             val origin = breed?.origin ?: "Unknown"
 

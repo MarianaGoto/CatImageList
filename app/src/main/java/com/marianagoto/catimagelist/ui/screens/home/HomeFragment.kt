@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.databinding.FragmentHomeBinding
-import com.marianagoto.catimagelist.ui.catlist.CatAdapter
+import com.marianagoto.catimagelist.ui.catlist.HomeCatAdapter
 import com.marianagoto.catimagelist.ui.helpers.ToastHelper.ShowCustomSnackbar
 import com.marianagoto.catimagelist.ui.helpers.UIState
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -16,7 +16,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private lateinit var adapter: CatAdapter
+    private lateinit var adapter: HomeCatAdapter
 
     private val viewModel: HomeViewModel by viewModel()
 
@@ -33,9 +33,21 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = CatAdapter { cat ->
-            viewModel.toggleFavorite(cat = cat, subId = BuildConfig.SUB_ID)
+
+        adapter = HomeCatAdapter { cat ->
+            if(cat.isFavorite){
+                viewModel.toggleFavorite(catId = cat.id, subId = BuildConfig.SUB_ID)
+            } else {
+//                cat.favoriteId?.let{ id ->
+//                    viewModel.removeFavoriteCat(id)
+//                    cat.favoriteId = null
+//                }?: run {
+//                    // Caso de segurança: se não temos o ID ainda (ex: API lenta)
+//                    Log.e("HomeFragment", "Não é possível remover: ID do favorito ainda não recebido")
+//                }
+            }
         }
+
 
         binding.recyclerViewHome.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.recyclerViewHome.adapter = adapter
@@ -83,8 +95,10 @@ class HomeFragment : Fragment() {
                 }
             }
             viewModel.snackbarMessage.observe(viewLifecycleOwner) { cat ->
-                ShowCustomSnackbar(view = binding.root, cat = cat)
-
+                if (cat != null) {
+                    ShowCustomSnackbar(view = binding.root, cat = cat)
+                    viewModel.resetSnackbarMessage()
+                }
             }
         }
     }

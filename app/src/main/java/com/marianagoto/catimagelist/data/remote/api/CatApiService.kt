@@ -1,10 +1,10 @@
 package com.marianagoto.catimagelist.data.remote.api
 
 import com.marianagoto.catimagelist.BuildConfig
-import com.marianagoto.catimagelist.domain.model.CatImage
-import com.marianagoto.catimagelist.domain.model.FavoriteRequest
-import com.marianagoto.catimagelist.domain.model.FavoriteResponseAdd
-import com.marianagoto.catimagelist.domain.model.FavoriteResponseList
+import com.marianagoto.catimagelist.data.dto.CatImageResponse
+import com.marianagoto.catimagelist.data.dto.FavoriteRequest
+import com.marianagoto.catimagelist.data.dto.FavoriteAddResponse
+import com.marianagoto.catimagelist.data.dto.FavoriteResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -20,21 +20,21 @@ interface CatApiService {
     @GET( "images/search")
     suspend fun searchCats(
         @Query("limit") limit: Int = 20,
-        @Query("has_breeds") hasBreeds: Int = 1,
+        @Query("has_breeds") hasBreeds: Boolean = true,
         @Header("x-api-key") apiKey: String = API_KEY
-    ): List<CatImage>
+    ): List<CatImageResponse>
 
     @GET("images/{id}")
-    suspend fun searchCatById(@Path("id") id: String): CatImage
+    suspend fun searchCatById(@Path("id") id: String): CatImageResponse
 
     @POST("favourites")
     suspend fun addFavoriteCatById(
         @Body favoriteRequest: FavoriteRequest,
         @Header("x-api-key") apiKey: String
-    ): FavoriteResponseAdd
+    ): FavoriteAddResponse
 
     @GET("favourites")
-    suspend fun searchFavoriteCats(@Header("x-api-key") apiKey: String): List<FavoriteResponseList>
+    suspend fun searchFavoriteCats(@Header("x-api-key") apiKey: String): List<FavoriteResponse>
 
     @DELETE("favourites/{favourite_id}")
     suspend fun removeFavoriteCatById(

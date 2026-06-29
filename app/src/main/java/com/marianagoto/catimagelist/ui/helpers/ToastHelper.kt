@@ -11,15 +11,15 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.marianagoto.catimagelist.R
 import com.marianagoto.catimagelist.databinding.CustomToastBinding
-import com.marianagoto.catimagelist.domain.model.CatImage
+import com.marianagoto.catimagelist.ui.vo.CatImageVO
 
 object ToastHelper {
 
-    fun showToast(context: Context, cat: CatImage) {
+    fun showToast(context: Context, cat: CatImageVO) {
         val inflater = LayoutInflater.from(context)
         val binding = CustomToastBinding.inflate(inflater)
 
-        val breedName = cat.breeds?.firstOrNull()?.name ?: "Gatinho fofo"
+        val breedName = cat.breeds.firstOrNull()?.name ?: "Gatinho fofo"
         binding.tvBreed.text = breedName
 
 //        binding.ivCat.load(cat.url){
@@ -40,11 +40,11 @@ object ToastHelper {
     }
 
     @SuppressLint("RestrictedApi")
-    fun ShowCustomSnackbar(view: View, cat: CatImage) {
+    fun ShowCustomSnackbar(view: View, cat: CatImageVO) {
         val snackbar = Snackbar.make(view, "", Snackbar.LENGTH_SHORT)
         val inflater = LayoutInflater.from(view.context)
         val snackBinding = CustomToastBinding.inflate(inflater)
-        val breedName = cat.breeds?.firstOrNull()?.name ?: "Gatinho"
+        val breedName = cat.breeds.firstOrNull()?.name ?: "Gatinho"
         snackBinding.tvBreed.text = breedName
         val snackbarLayout = snackbar.view as Snackbar.SnackbarLayout
 

@@ -95,28 +95,28 @@ class CatViewModel(
 //        return _cats.value?.filter { it.isFavorite } ?: emptyList()
 //    }
 
-    fun getFavorites() {
-        viewModelScope.launch {
-            _uiState.value = CatUiState.Loading
-
-            val result = repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
-            result.fold(
-                onSuccess = { catList ->
-                    _catsFavorite.value = catList
-                    _uiState.value = CatUiState.SucessoFavoritado(catList)
-                    Log.d("CatViewModel", "gatinho listado <3")
-
-
-
-                },
-                onFailure = { error ->
-                    val msg = error.localizedMessage ?: "Erro desconhecido"
-                    Log.e("CatViewModel", "Erro ao listar o gato favorito: $msg", error)
-                    _uiState.value = CatUiState.Error(msg)
-                }
-            )
-        }
-    }
+//    fun getFavorites() {
+//        viewModelScope.launch {
+//            _uiState.value = CatUiState.Loading
+//
+//            val result = repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
+//            result.fold(
+//                onSuccess = { catList ->
+//                    _catsFavorite.value = catList
+//                    _uiState.value = CatUiState.SucessoFavoritado(catList)
+//                    Log.d("CatViewModel", "gatinho listado <3")
+//
+//
+//
+//                },
+//                onFailure = { error ->
+//                    val msg = error.localizedMessage ?: "Erro desconhecido"
+//                    Log.e("CatViewModel", "Erro ao listar o gato favorito: $msg", error)
+//                    _uiState.value = CatUiState.Error(msg)
+//                }
+//            )
+//        }
+//    }
 
     //  * Atualiza o estado _hasNoFavorites com base na lista atual.
     private fun updateFavoriteState() {

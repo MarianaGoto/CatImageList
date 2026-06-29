@@ -7,15 +7,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.data.repository.CatRepository
-import com.marianagoto.catimagelist.domain.model.CatImage
+import com.marianagoto.catimagelist.domain.mapper.favoriteRichResponseToFavoriteRichVO
+import com.marianagoto.catimagelist.domain.usecase.GetFavoriteCatsUseCase
 import com.marianagoto.catimagelist.ui.helpers.UIState
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import com.marianagoto.catimagelist.ui.vo.FavoriteRichVO
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
-class FavoritesViewModel(private val repository: CatRepository) : ViewModel(){
-    private val _cats = MutableLiveData<UIState<List<CatImage>>>(UIState.Loading)
-    val cats: LiveData<UIState<List<CatImage>>> = _cats
+class FavoritesViewModel(private val repository: CatRepository, private val getFavoriteCatsUseCase: GetFavoriteCatsUseCase) : ViewModel(){
+    private val _cats = MutableLiveData<UIState<List<FavoriteRichVO>>>(UIState.Loading)
+    val cats: LiveData<UIState<List<FavoriteRichVO>>> = _cats
 
     private val _snackbarMessage = MutableLiveData<String>()
     val snackbarMessage: LiveData<String> = _snackbarMessage
@@ -26,28 +27,42 @@ class FavoritesViewModel(private val repository: CatRepository) : ViewModel(){
             // Carregando o gato favorito - usado para erro de conexão
             _cats.value = UIState.Loading
 
-            val result = repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
-            result.fold(
-                onSuccess = { catList ->
-                    val detailedCats = catList.map{ catFav ->
-                        async{
-                            val detail = repository.getCatById(catFav.imageId).getOrNull()
-                            detail?.copy(
-                                isFavorite = true,
-                                favoriteId = catFav.id
-                            )
-                        }
-                    }.awaitAll()
-
-                    _cats.value = UIState.Success(detailedCats.filterNotNull())
-                    Log.d("CatViewModel", "gatinho listado <3")
-                },
-                onFailure = { error ->
-                    val msg = error.localizedMessage ?: "Erro desconhecido"
-                    Log.e("CatViewModel", "Erro ao listar o gato favorito: $msg", error)
+            getFavoriteCatsUseCase.getFavoriteRichCats()
+                .catch { error ->
                     _cats.value = UIState.Error
+                    Log.e("FavoritesViewModel", "Erro: ${error.message}")
                 }
-            )
+                .collect { detailedList ->
+                    _cats.value = UIState.Success(favoriteRichResponseToFavoriteRichVO(detailedList))
+                }
+
+
+//            val result = repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
+//            result.fold(
+//                onSuccess = { favoriteResponse ->
+//                    val detailedCats = favoriteResponse.map { item ->
+//                        val catImageResponse = repository.getCatById(item.imageId)
+//                        val catImageVO = catImageDTOToVO(catImageResponse)
+//                    }
+//                        async{
+//                            val detail = repository.getCatById(catFav.imageId)
+//                            val catListVO = catImageDTOToVO(detail)
+//                            catListVO.copy(
+//                                isFavorite = true,
+//                                favoriteId = catFav.id
+//                            )
+//                        }
+//                    }.awaitAll()
+
+//                    _cats.value = UIState.Success(detailedCats.filterNotNull())
+//                    Log.d("CatViewModel", "gatinho listado <3")
+//                },
+//                onFailure = { error ->
+//                    val msg = error.localizedMessage ?: "Erro desconhecido"
+//                    Log.e("CatViewModel", "Erro ao listar o gato favorito: $msg", error)
+//                    _cats.value = UIState.Error
+//                }
+//            )
         }
     }
 
