@@ -1,16 +1,21 @@
 package com.marianagoto.catimagelist.ui.screens.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.databinding.FragmentHomeBinding
 import com.marianagoto.catimagelist.ui.catlist.HomeCatAdapter
 import com.marianagoto.catimagelist.ui.helpers.ToastHelper.ShowCustomSnackbar
 import com.marianagoto.catimagelist.ui.helpers.UIState
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : Fragment() {
@@ -30,6 +35,7 @@ class HomeFragment : Fragment() {
 
     }
 
+    @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -66,6 +72,15 @@ class HomeFragment : Fragment() {
         binding.errorLayout.btnRetry.setOnClickListener{
             viewModel.getCats()
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.favoriteBreedName.collect { favoriteBreedName ->
+                    ShowCustomSnackbar(view = binding.root, breedName = favoriteBreedName)
+
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -93,12 +108,6 @@ class HomeFragment : Fragment() {
                     binding.recyclerViewHome.visibility = View.VISIBLE
                     adapter.submitList(uiState.data)
                 }
-            }
-        }
-
-        viewModel.favoriteBreedName.observe(viewLifecycleOwner) { favoriteBreedName ->
-            if (favoriteBreedName != null) {
-                ShowCustomSnackbar(view = binding.root, breedName = favoriteBreedName)
             }
         }
     }

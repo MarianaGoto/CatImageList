@@ -21,6 +21,7 @@ android-utils = "1.0.0"
 swiperefreshlayout = "1.2.0"
 koin = "3.5.3"
 material3 = "1.4.0"
+kotlinx-coroutines = "1.8.1"
 
 
 [libraries]
@@ -53,6 +54,7 @@ android-utils = { group = "com.gitlab.developerdeveloperdeveloper", name = "andr
 androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
