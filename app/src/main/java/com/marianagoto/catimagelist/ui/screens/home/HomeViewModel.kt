@@ -11,16 +11,17 @@ import com.marianagoto.catimagelist.data.repository.CatRepository
 import com.marianagoto.catimagelist.domain.mapper.catImageDTOToVO
 import com.marianagoto.catimagelist.ui.helpers.UIState
 import com.marianagoto.catimagelist.ui.vo.CatImageVO
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 
 class HomeViewModel(private val repository: CatRepository) : ViewModel() {
     private val _cats = MutableLiveData<UIState<List<CatImageVO>>>()
     val cats: LiveData<UIState<List<CatImageVO>>> = _cats
-
-    private val _favoriteBreedName = MutableLiveData<String>()
-    val favoriteBreedName: LiveData<String> = _favoriteBreedName
-
+    private val _favoriteBreedName = MutableSharedFlow<String>(0)
+    val favoriteBreedName: SharedFlow<String> = _favoriteBreedName.asSharedFlow()
 
 
     fun getCats() {
@@ -57,7 +58,7 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
 
 //                    cat.favoriteId = response.id
 //                    cat.isFavorite = true
-                    _favoriteBreedName.postValue(cat.breeds.firstOrNull()?.name ?: "Sem raça definida")
+                    _favoriteBreedName.emit(cat.breeds.firstOrNull()?.name ?: "Sem raça definida")
                 },
                 onFailure = { error ->
                     val msg = error.localizedMessage ?: "Erro desconhecido"
@@ -70,9 +71,6 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
         }
     }
 
-    fun resetFavoriteBreedName() {
-        _favoriteBreedName.value = null
-    }
 
     fun removeFavoriteCat(favouriteId: Int) {
         viewModelScope.launch {
