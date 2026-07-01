@@ -15,6 +15,7 @@ import com.marianagoto.catimagelist.databinding.FragmentHomeBinding
 import com.marianagoto.catimagelist.ui.catlist.HomeCatAdapter
 import com.marianagoto.catimagelist.ui.helpers.ToastHelper.ShowCustomSnackbar
 import com.marianagoto.catimagelist.ui.helpers.UIState
+import com.marianagoto.catimagelist.ui.util.lifecycleScopeRepeat
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -73,14 +74,9 @@ class HomeFragment : Fragment() {
             viewModel.getCats()
         }
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.favoriteBreedName.collect { favoriteBreedName ->
-                    ShowCustomSnackbar(view = binding.root, breedName = favoriteBreedName)
 
-                }
-            }
-        }
+
+
     }
 
     override fun onResume() {
@@ -89,24 +85,37 @@ class HomeFragment : Fragment() {
         viewModel.getCats()
     }
 
-    private fun setupObservables(){
-        viewModel.cats.observe(viewLifecycleOwner){ uiState ->
-            when(uiState){
-                is UIState.Loading -> {
-                    binding.ltLoading.visibility = View.VISIBLE
-                    binding.errorLayout.nsError.visibility = View.GONE
-                    binding.recyclerViewHome.visibility = View.GONE
+    private fun setupObservables() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.cats.collect { uiState ->
+                    when (uiState) {
+                        is UIState.Loading -> {
+                            binding.ltLoading.visibility = View.VISIBLE
+                            binding.errorLayout.nsError.visibility = View.GONE
+                            binding.recyclerViewHome.visibility = View.GONE
+                        }
+
+                        is UIState.Error -> {
+                            binding.ltLoading.visibility = View.GONE
+                            binding.errorLayout.nsError.visibility = View.VISIBLE
+                            binding.recyclerViewHome.visibility = View.GONE
+                        }
+
+                        is UIState.Success -> {
+                            binding.ltLoading.visibility = View.GONE
+                            binding.errorLayout.nsError.visibility = View.GONE
+                            binding.recyclerViewHome.visibility = View.VISIBLE
+                            adapter.submitList(uiState.data)
+                        }
+                    }
                 }
-                is UIState.Error -> {
-                    binding.ltLoading.visibility = View.GONE
-                    binding.errorLayout.nsError.visibility = View.VISIBLE
-                    binding.recyclerViewHome.visibility = View.GONE
-                }
-                is UIState.Success -> {
-                    binding.ltLoading.visibility = View.GONE
-                    binding.errorLayout.nsError.visibility = View.GONE
-                    binding.recyclerViewHome.visibility = View.VISIBLE
-                    adapter.submitList(uiState.data)
+            }
+
+            lifecycleScopeRepeat {
+                viewModel.favoriteBreedName.collect { favoriteBreedName ->
+                    ShowCustomSnackbar(view = binding.root, breedName = favoriteBreedName)
+
                 }
             }
         }
