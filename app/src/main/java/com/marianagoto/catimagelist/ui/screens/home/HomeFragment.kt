@@ -86,37 +86,35 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupObservables() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.cats.collect { uiState ->
-                    when (uiState) {
-                        is UIState.Loading -> {
-                            binding.ltLoading.visibility = View.VISIBLE
-                            binding.errorLayout.nsError.visibility = View.GONE
-                            binding.recyclerViewHome.visibility = View.GONE
-                        }
+        lifecycleScopeRepeat {
+            viewModel.cats.collect { uiState ->
+                when (uiState) {
+                    is UIState.Loading -> {
+                        binding.ltLoading.visibility = View.VISIBLE
+                        binding.errorLayout.nsError.visibility = View.GONE
+                        binding.recyclerViewHome.visibility = View.GONE
+                    }
 
-                        is UIState.Error -> {
-                            binding.ltLoading.visibility = View.GONE
-                            binding.errorLayout.nsError.visibility = View.VISIBLE
-                            binding.recyclerViewHome.visibility = View.GONE
-                        }
+                    is UIState.Error -> {
+                        binding.ltLoading.visibility = View.GONE
+                        binding.errorLayout.nsError.visibility = View.VISIBLE
+                        binding.recyclerViewHome.visibility = View.GONE
+                    }
 
-                        is UIState.Success -> {
-                            binding.ltLoading.visibility = View.GONE
-                            binding.errorLayout.nsError.visibility = View.GONE
-                            binding.recyclerViewHome.visibility = View.VISIBLE
-                            adapter.submitList(uiState.data)
-                        }
+                    is UIState.Success -> {
+                        binding.ltLoading.visibility = View.GONE
+                        binding.errorLayout.nsError.visibility = View.GONE
+                        binding.recyclerViewHome.visibility = View.VISIBLE
+                        adapter.submitList(uiState.data)
                     }
                 }
             }
+        }
 
-            lifecycleScopeRepeat {
-                viewModel.favoriteBreedName.collect { favoriteBreedName ->
-                    ShowCustomSnackbar(view = binding.root, breedName = favoriteBreedName)
+        lifecycleScopeRepeat {
+            viewModel.favoriteBreedName.collect { favoriteBreedName ->
+                ShowCustomSnackbar(view = binding.root, breedName = favoriteBreedName)
 
-                }
             }
         }
     }
