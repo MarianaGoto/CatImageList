@@ -1,8 +1,6 @@
 package com.marianagoto.catimagelist.ui.screens.home
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.marianagoto.catimagelist.BuildConfig
@@ -12,33 +10,39 @@ import com.marianagoto.catimagelist.domain.mapper.catImageDTOToVO
 import com.marianagoto.catimagelist.ui.helpers.UIState
 import com.marianagoto.catimagelist.ui.vo.CatImageVO
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 
 class HomeViewModel(private val repository: CatRepository) : ViewModel() {
-    private val _cats = MutableLiveData<UIState<List<CatImageVO>>>()
-    val cats: LiveData<UIState<List<CatImageVO>>> = _cats
+    private val _cats = MutableStateFlow<UIState<List<CatImageVO>>>(UIState.Loading)
+    val cats: StateFlow<UIState<List<CatImageVO>>> = _cats.asStateFlow()
+
+
     private val _favoriteBreedName = MutableSharedFlow<String>(0)
     val favoriteBreedName: SharedFlow<String> = _favoriteBreedName.asSharedFlow()
 
 
     fun getCats() {
         viewModelScope.launch {
-            // Carregando lista de gatos - usado para erro de conexão
-            _cats.value = UIState.Loading
-
             repository.getCatsList(limit = 20)
-                .onSuccess { catListResponse ->
-                    val catListVO = catImageDTOToVO(catListResponse)
-                    _cats.value = UIState.Success(catListVO)
-                    logCatDetails(catListVO)
-
-                }.onFailure { error ->
+                .onStart {
+                    _cats.value = UIState.Loading
+                }
+                .catch { error ->
                     val errorMessage = getErrorMessage(error)
-                    Log.e("CatViewModel", "Erro ao carregar gatos: $errorMessage", error)
+                    Log.e("HomeViewModel", "Erro ao carregar gatos: $errorMessage", error)
                     _cats.value = UIState.Error
+                }
+                .collect { detailedCats ->
+                    val catListVO = catImageDTOToVO(detailedCats)
+                    _cats.value = UIState.Success(catListVO)
                 }
         }
     }

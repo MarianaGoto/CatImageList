@@ -2,7 +2,7 @@ package com.marianagoto.catimagelist.domain.usecase
 
 import com.marianagoto.catimagelist.data.dto.CatImageResponse
 import com.marianagoto.catimagelist.data.repository.CatRepository
-import com.marianagoto.catimagelist.domain.model.CatImage
+import kotlinx.coroutines.flow.Flow
 
 class GetCatsUseCase(
     private val repository: CatRepository
@@ -12,7 +12,7 @@ class GetCatsUseCase(
      * @param limit Quantidade de gatos (padrão: 20)
      * @return Result com lista de CatImage ou erro
      */
-    suspend operator fun invoke(limit: Int = 20): Result<List<CatImageResponse>> {
+    operator fun invoke(limit: Int = 20): Flow<List<CatImageResponse>> {
         return repository.getCatsList(limit)
     }
 }
