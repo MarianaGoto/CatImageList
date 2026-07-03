@@ -1,8 +1,8 @@
 package com.marianagoto.catimagelist.ui.vo
 
-data class CatFeedItem(
+data class CatItemVO(
     val image: CatImageVO,
-    val favouriteId: Int?
+    val favoriteId: Int?
 ) {
-    val isFavourite: Boolean get() = favouriteId != null
+    val isFavorite: Boolean get() = favoriteId != null
 }

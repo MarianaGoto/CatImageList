@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.marianagoto.catimagelist.databinding.FragmentFavoritesBinding
-import com.marianagoto.catimagelist.ui.catlist.FavoriteCatAdapter
-import com.marianagoto.catimagelist.ui.catlist.HomeCatAdapter
-import com.marianagoto.catimagelist.ui.helpers.UIState
+import com.marianagoto.catimagelist.ui.adapter.FavoriteCatAdapter
+import com.marianagoto.catimagelist.ui.state.UIState
+import com.marianagoto.catimagelist.ui.util.lifecycleScopeRepeat
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
@@ -54,26 +54,30 @@ class FavoritesFragment : Fragment() {
         }
     }
 
-    private fun setupObservables(){
-        viewModel.cats.observe(viewLifecycleOwner){ uiState ->
-            when(uiState){
-                is UIState.Loading -> {
-                    binding.ltLoading.visibility = View.VISIBLE
-                    binding.errorLayout.nsError.visibility = View.GONE
-                    binding.recyclerViewFavorites.visibility = View.GONE
-                }
-                is UIState.Error -> {
-                    binding.ltLoading.visibility = View.GONE
-                    binding.errorLayout.nsError.visibility = View.VISIBLE
-                    binding.recyclerViewFavorites.visibility = View.GONE
-                }
-                is UIState.Success -> {
-                    binding.ltLoading.visibility = View.GONE
-                    binding.errorLayout.nsError.visibility = View.GONE
-                    binding.recyclerViewFavorites.visibility = View.VISIBLE
+    private fun setupObservables() {
+        lifecycleScopeRepeat {
+            viewModel.cats.collect { uiState ->
+                when (uiState) {
+                    is UIState.Loading -> {
+                        binding.ltLoading.visibility = View.VISIBLE
+                        binding.errorLayout.nsError.visibility = View.GONE
+                        binding.recyclerViewFavorites.visibility = View.GONE
+                    }
 
-                    val catImageList = uiState.data
-                    adapter.submitList(catImageList)
+                    is UIState.Error -> {
+                        binding.ltLoading.visibility = View.GONE
+                        binding.errorLayout.nsError.visibility = View.VISIBLE
+                        binding.recyclerViewFavorites.visibility = View.GONE
+                    }
+
+                    is UIState.Success -> {
+                        binding.ltLoading.visibility = View.GONE
+                        binding.errorLayout.nsError.visibility = View.GONE
+                        binding.recyclerViewFavorites.visibility = View.VISIBLE
+
+                        val catImageList = uiState.data
+                        adapter.submitList(catImageList)
+                    }
                 }
             }
         }

@@ -1,11 +1,9 @@
 package com.marianagoto.catimagelist.data.remote.api
 
 import com.marianagoto.catimagelist.BuildConfig
-import com.marianagoto.catimagelist.data.dto.CatImageResponse
-import com.marianagoto.catimagelist.data.dto.CreateFavouriteRequestDto
-import com.marianagoto.catimagelist.data.dto.CreateFavouriteResponseDto
+import com.marianagoto.catimagelist.data.dto.CreateFavoriteRequestDto
+import com.marianagoto.catimagelist.data.dto.CreateFavoriteResponseDto
 import com.marianagoto.catimagelist.data.dto.FavoriteDto
-import com.marianagoto.catimagelist.data.dto.FavoriteResponse
 import com.marianagoto.catimagelist.data.dto.ImageDto
 import retrofit2.Response
 import retrofit2.http.Body
@@ -31,22 +29,22 @@ interface CatApiService {
 
     @POST("favourites")
     suspend fun addFavoriteCatById(
-        @Body favoriteRequest: CreateFavouriteRequestDto,
+        @Body favoriteRequest: CreateFavoriteRequestDto,
         @Header("x-api-key") apiKey: String
-    ): CreateFavouriteResponseDto
+    ): CreateFavoriteResponseDto
 
     @GET("favourites")
     suspend fun searchFavoriteCats(@Header("x-api-key") apiKey: String): List<FavoriteDto>
 
     @DELETE("favourites/{favourite_id}")
     suspend fun removeFavoriteCatById(
-        @Path("favourite_id") favouriteId: Int,
+        @Path("favourite_id") favoriteId: Int,
         @Header("x-api-key") apiKey: String
     ): Response<Unit>
 
     @GET("favourites/{favourite_id}")
     suspend fun getFavoriteCatById(
-        @Path("favourite_id") favouriteId: Int,
+        @Path("favourite_id") favoriteId: Int,
         @Header("x-api-key") apiKey: String
     ): FavoriteDto
 }

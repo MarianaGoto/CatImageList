@@ -1,4 +1,4 @@
-package com.marianagoto.catimagelist.ui.catlist
+package com.marianagoto.catimagelist.ui.adapter
 
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -13,18 +13,18 @@ import com.ddd.androidutils.DoubleClick
 import com.ddd.androidutils.DoubleClickListener
 import com.marianagoto.catimagelist.R
 import com.marianagoto.catimagelist.databinding.ItemCatBinding
-import com.marianagoto.catimagelist.ui.vo.CatImageVO
-import com.marianagoto.catimagelist.util.AnimationUtils
+import com.marianagoto.catimagelist.ui.vo.FavoriteRichVO
+import com.marianagoto.catimagelist.ui.util.AnimationUtils
 
 
-class HomeCatAdapter(
-    private val onFavoriteClick: (CatImageVO) -> Unit
-) : ListAdapter<CatImageVO, HomeCatAdapter.VH>(DIFF_CALLBACK) {
+class FavoriteCatAdapter(
+    private val onFavoriteClick: (FavoriteRichVO) -> Unit
+) : ListAdapter<FavoriteRichVO, FavoriteCatAdapter.VH>(DIFF_CALLBACK) {
     companion object {
-        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<CatImageVO>() {
-            override fun areItemsTheSame(old: CatImageVO, new: CatImageVO) = old.id == new.id
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<FavoriteRichVO>() {
+            override fun areItemsTheSame(old: FavoriteRichVO, new: FavoriteRichVO) = old.favoriteId == new.favoriteId
 
-            override fun areContentsTheSame(old: CatImageVO, new: CatImageVO) = old == new
+            override fun areContentsTheSame(old: FavoriteRichVO, new: FavoriteRichVO) = old == new
         }
     }
 
@@ -39,8 +39,8 @@ class HomeCatAdapter(
     }
 
     class VH(val binding: ItemCatBinding) : RecyclerView.ViewHolder(binding.root) {
-        private var currentCat: CatImageVO? = null
-        private var currentOnFavoriteClick: ((CatImageVO) -> Unit)? = null
+        private var currentCat: FavoriteRichVO? = null
+        private var currentOnFavoriteClick: ((FavoriteRichVO) -> Unit)? = null
         private var lastClickTime: Long = 0
         val doubleClick = DoubleClick(object : DoubleClickListener {
             override fun onSingleClickEvent(view: View?) {
@@ -62,15 +62,15 @@ class HomeCatAdapter(
             }
         })
 
-        fun bind(cat: CatImageVO, onFavoriteClick: (CatImageVO) -> Unit) = with(binding) {
+        fun bind(cat: FavoriteRichVO, onFavoriteClick: (FavoriteRichVO) -> Unit) = with(binding) {
             currentCat = cat
             currentOnFavoriteClick = onFavoriteClick
-            sivCat.load(cat.url)
+            sivCat.load(cat.urlImage)
 
-            val breed = cat.breeds?.firstOrNull()
+            val breed = cat.breedName.firstOrNull()
 
-            tvTitleImg.text = breed?.name ?: "Gatinho sem raça definida"
-            tvSubtitleImg.text = breed?.origin ?: "Sem informações"
+            tvTitleImg.text = cat.breedName
+            tvSubtitleImg.text = cat.breedOrigin
             updateFavoriteUI(cat)
 
             ivFavoriteIcon.setOnClickListener { view ->
@@ -85,7 +85,7 @@ class HomeCatAdapter(
             }
             sivCat.setOnClickListener(doubleClick)
         }
-        private fun updateFavoriteUI(cat: CatImageVO) {
+        private fun updateFavoriteUI(cat: FavoriteRichVO) {
             if (cat.isFavorite) {
                 binding.ivFavoriteIcon.setColorFilter(
                     ContextCompat.getColor(binding.root.context, R.color.red_300)

@@ -15,7 +15,7 @@
         android:theme="@style/Theme.CatImageList"
         android:name=".di.CatApplication">
         <activity
-            android:name=".ui.catlist.CatListActivity"
+            android:name=".ui.adapter.CatListActivity"
             android:exported="false"
             android:label="@string/title_activity_cat_list"
             android:theme="@style/Theme.CatImageList" />

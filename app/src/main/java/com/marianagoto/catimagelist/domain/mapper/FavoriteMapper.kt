@@ -1,12 +1,11 @@
 package com.marianagoto.catimagelist.domain.mapper
 
-import com.marianagoto.catimagelist.data.dto.CatImageResponse
 import com.marianagoto.catimagelist.data.dto.FavoriteDto
 import com.marianagoto.catimagelist.data.dto.FavoriteRichResponse
 import com.marianagoto.catimagelist.data.dto.ImageDto
 import com.marianagoto.catimagelist.ui.vo.FavoriteRichVO
 
-fun catImageResponseAndFavoriteResponseToFavoriteRichResponse(catImageResponse: CatImageResponse, favoriteResponse: FavoriteDto): FavoriteRichResponse {
+fun catImageResponseAndFavoriteResponseToFavoriteRichResponse(catImageResponse: ImageDto, favoriteResponse: FavoriteDto): FavoriteRichResponse {
     return FavoriteRichResponse(
         favoriteId = favoriteResponse.id,
         urlImage = favoriteResponse.image.url,

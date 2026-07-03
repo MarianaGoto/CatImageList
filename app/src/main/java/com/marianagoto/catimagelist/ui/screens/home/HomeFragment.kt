@@ -6,17 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.databinding.FragmentHomeBinding
-import com.marianagoto.catimagelist.ui.catlist.HomeCatAdapter
-import com.marianagoto.catimagelist.ui.helpers.ToastHelper.ShowCustomSnackbar
-import com.marianagoto.catimagelist.ui.helpers.UIState
+import com.marianagoto.catimagelist.ui.adapter.HomeCatAdapter
+import com.marianagoto.catimagelist.ui.util.ToastHelper.ShowCustomSnackbar
+import com.marianagoto.catimagelist.ui.state.UIState
 import com.marianagoto.catimagelist.ui.util.lifecycleScopeRepeat
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : Fragment() {
@@ -46,34 +42,8 @@ class HomeFragment : Fragment() {
                 lifecycleScopeRepeat {
                     viewModel.addFavorite(cat = cat, subId = BuildConfig.SUB_ID)
                 }
-            } else{
-//                lifecycleScopeRepeat {
-//                    viewModel.removeFavoriteCat(cat = cat, favoriteCat = cat.favoriteId)
-//                }
             }
         }
-
-
-
-//            if(cat.isFavorite){
-//                viewModel.addFavorite(cat = cat, subId = BuildConfig.SUB_ID)
-//            } else {
-//                viewModel.removeFavoriteCat(cat = cat, favouriteId = cat.favoriteId)
-
-
-
-
-
-//                cat.favoriteId?.let{ id ->
-//                    viewModel.removeFavoriteCat(id)
-//                    cat.favoriteId = null
-//                }?: run {
-//                    // Caso de segurança: se não temos o ID ainda (ex: API lenta)
-//                    Log.e("HomeFragment", "Não é possível remover: ID do favorito ainda não recebido")
-//                }
-
-
-
 
         binding.recyclerViewHome.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.recyclerViewHome.adapter = adapter
@@ -92,9 +62,6 @@ class HomeFragment : Fragment() {
         binding.errorLayout.btnRetry.setOnClickListener{
             viewModel.getCats()
         }
-
-
-
 
     }
 

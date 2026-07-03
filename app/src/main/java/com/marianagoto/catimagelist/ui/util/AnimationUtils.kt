@@ -1,6 +1,6 @@
-package com.marianagoto.catimagelist.util
+package com.marianagoto.catimagelist.ui.util
+
 import android.animation.ValueAnimator
-import android.animation.ValueAnimator.*
 import android.view.View
 
 object AnimationUtils {

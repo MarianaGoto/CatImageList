@@ -1,6 +1,5 @@
 package com.marianagoto.catimagelist.domain.usecase
 
-import com.marianagoto.catimagelist.data.dto.CatImageResponse
 import com.marianagoto.catimagelist.data.dto.ImageDto
 import com.marianagoto.catimagelist.data.repository.CatRepository
 import kotlinx.coroutines.flow.Flow

@@ -1,7 +1,8 @@
-package com.marianagoto.catimagelist.ui.helpers
+package com.marianagoto.catimagelist.ui.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -47,7 +48,7 @@ object ToastHelper {
         snackBinding.tvBreed.text = breedName
         val snackbarLayout = snackbar.view as Snackbar.SnackbarLayout
 
-        snackbarLayout.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
         snackbarLayout.setPadding(0, 0, 0, 0)
         snackbarLayout.removeAllViews()
         snackbarLayout.addView(snackBinding.root, 0)

@@ -9,14 +9,17 @@ import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.data.repository.CatRepository
 import com.marianagoto.catimagelist.domain.mapper.favoriteRichResponseToFavoriteRichVO
 import com.marianagoto.catimagelist.domain.usecase.GetFavoriteCatsUseCase
-import com.marianagoto.catimagelist.ui.helpers.UIState
+import com.marianagoto.catimagelist.ui.state.UIState
 import com.marianagoto.catimagelist.ui.vo.FavoriteRichVO
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class FavoritesViewModel(private val repository: CatRepository, private val getFavoriteCatsUseCase: GetFavoriteCatsUseCase) : ViewModel(){
-    private val _cats = MutableLiveData<UIState<List<FavoriteRichVO>>>(UIState.Loading)
-    val cats: LiveData<UIState<List<FavoriteRichVO>>> = _cats
+    private val _cats = MutableStateFlow<UIState<List<FavoriteRichVO>>>(UIState.Loading)
+    val cats: StateFlow<UIState<List<FavoriteRichVO>>> = _cats.asStateFlow()
 
     private val _snackbarMessage = MutableLiveData<String>()
     val snackbarMessage: LiveData<String> = _snackbarMessage
@@ -35,34 +38,6 @@ class FavoritesViewModel(private val repository: CatRepository, private val getF
                 .collect { detailedList ->
                     _cats.value = UIState.Success(favoriteRichResponseToFavoriteRichVO(detailedList))
                 }
-
-
-//            val result = repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
-//            result.fold(
-//                onSuccess = { favoriteResponse ->
-//                    val detailedCats = favoriteResponse.map { item ->
-//                        val catImageResponse = repository.getCatById(item.imageId)
-//                        val catImageVO = catImageDTOToVO(catImageResponse)
-//                    }
-//                        async{
-//                            val detail = repository.getCatById(catFav.imageId)
-//                            val catListVO = catImageDTOToVO(detail)
-//                            catListVO.copy(
-//                                isFavorite = true,
-//                                favoriteId = catFav.id
-//                            )
-//                        }
-//                    }.awaitAll()
-
-//                    _cats.value = UIState.Success(detailedCats.filterNotNull())
-//                    Log.d("CatViewModel", "gatinho listado <3")
-//                },
-//                onFailure = { error ->
-//                    val msg = error.localizedMessage ?: "Erro desconhecido"
-//                    Log.e("CatViewModel", "Erro ao listar o gato favorito: $msg", error)
-//                    _cats.value = UIState.Error
-//                }
-//            )
         }
     }
 
