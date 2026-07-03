@@ -66,22 +66,18 @@ class FavoritesViewModel(private val repository: CatRepository, private val getF
         }
     }
 
-    fun removeFavoriteCat(favouriteId: Int) {
+    fun removeFavoriteCat(favoriteId: Int) {
         viewModelScope.launch {
-            val result = repository.removeFavoriteCat(favouriteId = favouriteId, apiKey = BuildConfig.API_KEY)
-
-            result.fold(
-                onSuccess = { catList ->
-                    Log.d("FavoritesViewModel", "Deletado com sucesso ID: $favouriteId")
-                    getFavoriteCats()
-                    _snackbarMessage.value = "Removido dos favoritos"
-
-                },
-                onFailure = { error ->
+            repository.removeFavoriteCat(favoriteId = favoriteId, apiKey = BuildConfig.API_KEY)
+                .catch { error ->
                     val msg = error.localizedMessage ?: "Erro ao remover"
                     Log.e("FavoritesViewModel", "Falha ao remover favorito: $msg")
                 }
-            )
+                .collect {
+                    Log.d("FavoritesViewModel", "Deletado com sucesso ID: $favoriteId")
+                    getFavoriteCats()
+                    _snackbarMessage.value = "Removido dos favoritos"
+                }
         }
     }
 }

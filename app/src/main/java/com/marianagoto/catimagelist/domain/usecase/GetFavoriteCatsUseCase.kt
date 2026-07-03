@@ -4,6 +4,7 @@ import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.data.dto.FavoriteRichResponse
 import com.marianagoto.catimagelist.data.repository.CatRepository
 import com.marianagoto.catimagelist.domain.mapper.catImageResponseAndFavoriteResponseToFavoriteRichResponse
+import com.marianagoto.catimagelist.domain.mapper.imageDtoAndFavoriteDtoToFavoriteRichVO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -26,10 +27,15 @@ class GetFavoriteCatsUseCase(private val repository: CatRepository) {
 
                         catDetailResult.fold(onSuccess = { catImageResponse ->
                             // Mapeia para o objeto rico (VO/DTO consolidado)
-                            catImageResponseAndFavoriteResponseToFavoriteRichResponse(
-                                catImageResponse = catImageResponse,
-                                favoriteResponse = favoriteResponse
+                            imageDtoAndFavoriteDtoToFavoriteRichVO(
+                                imageDto = catImageResponse,
+                                favoriteDto = favoriteResponse
                             )
+
+//                            catImageResponseAndFavoriteResponseToFavoriteRichResponse(
+//                                catImageResponse = catImageResponse,
+//                                favoriteResponse = favoriteResponse
+//                            )
                         }, onFailure = {
                             null // Se falhar um gato, retornamos null para filtrar depois
                         })

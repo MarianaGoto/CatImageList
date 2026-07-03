@@ -8,5 +8,5 @@ data class CatImageResponse (
     val width: Int,
     val height: Int,
     @SerializedName("mime_type") val mimeType: String,
-    val breeds: List<BreedResponse>?
+    val breeds: List<BreedDto>?
 )

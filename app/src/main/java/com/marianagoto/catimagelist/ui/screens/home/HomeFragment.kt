@@ -42,9 +42,28 @@ class HomeFragment : Fragment() {
 
 
         adapter = HomeCatAdapter { cat ->
-            if(cat.isFavorite){
-                viewModel.toggleFavorite(cat = cat, subId = BuildConfig.SUB_ID)
-            } else {
+            if (cat.isFavorite) {
+                lifecycleScopeRepeat {
+                    viewModel.addFavorite(cat = cat, subId = BuildConfig.SUB_ID)
+                }
+            } else{
+//                lifecycleScopeRepeat {
+//                    viewModel.removeFavoriteCat(cat = cat, favoriteCat = cat.favoriteId)
+//                }
+            }
+        }
+
+
+
+//            if(cat.isFavorite){
+//                viewModel.addFavorite(cat = cat, subId = BuildConfig.SUB_ID)
+//            } else {
+//                viewModel.removeFavoriteCat(cat = cat, favouriteId = cat.favoriteId)
+
+
+
+
+
 //                cat.favoriteId?.let{ id ->
 //                    viewModel.removeFavoriteCat(id)
 //                    cat.favoriteId = null
@@ -52,8 +71,8 @@ class HomeFragment : Fragment() {
 //                    // Caso de segurança: se não temos o ID ainda (ex: API lenta)
 //                    Log.e("HomeFragment", "Não é possível remover: ID do favorito ainda não recebido")
 //                }
-            }
-        }
+
+
 
 
         binding.recyclerViewHome.layoutManager = GridLayoutManager(requireContext(), 2)

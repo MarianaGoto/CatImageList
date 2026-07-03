@@ -1,12 +1,12 @@
 package com.marianagoto.catimagelist.domain.mapper
 
-import com.marianagoto.catimagelist.data.dto.BreedResponse
+import com.marianagoto.catimagelist.data.dto.BreedDto
 import com.marianagoto.catimagelist.ui.vo.BreedVO
 
-fun breedDTOToVO(breedResponse: BreedResponse): BreedVO{
-    return BreedVO(name = breedResponse.name, origin = breedResponse.origin ?: "")
+fun breedDTOToVO(breedDto: BreedDto): BreedVO{
+    return BreedVO(name = breedDto.name, origin = breedDto.origin ?: "")
 }
 
-fun breedDTOToVO(breedResponseList: List<BreedResponse>): List<BreedVO>{
-    return breedResponseList.map { item -> breedDTOToVO(item) }
+fun breedDTOToVO(breedDtoList: List<BreedDto>): List<BreedVO>{
+    return breedDtoList.map { item -> breedDTOToVO(item) }
 }
