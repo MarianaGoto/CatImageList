@@ -3,7 +3,7 @@ package com.marianagoto.catimagelist.domain.usecase
 import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.data.dto.FavoriteRichResponse
 import com.marianagoto.catimagelist.data.repository.CatRepository
-import com.marianagoto.catimagelist.domain.mapper.catImageResponseAndFavoriteResponseToFavoriteRichResponse
+import com.marianagoto.catimagelist.domain.mapper.imageDtoAndFavoriteDtoToFavoriteRichVO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -26,9 +26,9 @@ class GetFavoriteCatsUseCase(private val repository: CatRepository) {
 
                         catDetailResult.fold(onSuccess = { catImageResponse ->
                             // Mapeia para o objeto rico (VO/DTO consolidado)
-                            catImageResponseAndFavoriteResponseToFavoriteRichResponse(
-                                catImageResponse = catImageResponse,
-                                favoriteResponse = favoriteResponse
+                            imageDtoAndFavoriteDtoToFavoriteRichVO(
+                                imageDto = catImageResponse,
+                                favoriteDto = favoriteResponse
                             )
                         }, onFailure = {
                             null // Se falhar um gato, retornamos null para filtrar depois
@@ -47,43 +47,5 @@ class GetFavoriteCatsUseCase(private val repository: CatRepository) {
         })
     }
 }
-
-
-
-
-
-//    suspend fun getFavoriteRichCats() :Result<List<FavoriteRichResponse>>{
-//        try {
-//            val result = repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
-//            result.fold(
-//                onSuccess = { favoriteResponseList ->
-//                    favoriteResponseList.forEach { favoriteResponse ->
-//                        async {
-//                            val result = repository.getCatById(favoriteResponse.imageId)
-//                            result.fold(
-//                                onSuccess = { catImageResponse ->
-//                                    val favoriteVO =
-//                                        catImageResponseAndFavoriteResponseToFavoriteRichResponse(
-//                                            catImageResponse = catImageResponse,
-//                                            favoriteResponse = favoriteResponse
-//                                        )
-//                                    return Result.success(favoriteVO)
-//                                },
-//                                onFailure = { e ->
-//                                    return Result.failure(e)
-//                                }
-//                            )
-//                        }.awaitAll()
-//                    }
-//                },
-//                onFailure = { e ->
-//                    return Result.failure(e)
-//                }
-//            )
-//        } catch (e: Exception) {
-//            return Result.failure(e)
-//        }
-//    }
-//}
 
 

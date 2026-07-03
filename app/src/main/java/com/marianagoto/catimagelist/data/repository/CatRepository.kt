@@ -1,10 +1,11 @@
 package com.marianagoto.catimagelist.data.repository
 
 import android.util.Log
-import com.marianagoto.catimagelist.data.dto.CatImageResponse
-import com.marianagoto.catimagelist.data.dto.FavoriteAddResponse
-import com.marianagoto.catimagelist.data.dto.FavoriteRequest
-import com.marianagoto.catimagelist.data.dto.FavoriteResponse
+import com.marianagoto.catimagelist.BuildConfig
+import com.marianagoto.catimagelist.data.dto.CreateFavoriteRequestDto
+import com.marianagoto.catimagelist.data.dto.CreateFavoriteResponseDto
+import com.marianagoto.catimagelist.data.dto.FavoriteDto
+import com.marianagoto.catimagelist.data.dto.ImageDto
 import com.marianagoto.catimagelist.data.network.RetrofitClient
 import com.marianagoto.catimagelist.data.remote.api.CatApiService
 import kotlinx.coroutines.async
@@ -17,7 +18,7 @@ import retrofit2.Response
 class CatRepository(
     private val apiService: CatApiService = RetrofitClient.service
 ) {
-    fun getCatsList(limit: Int = 20): Flow<List<CatImageResponse>> = flow {
+    fun getCatsList(limit: Int = 20): Flow<List<ImageDto>> = flow {
         val initialCats = apiService.searchCats(limit = limit, hasBreeds = true)
         val detailedCats = coroutineScope {
             initialCats.map { cat ->
@@ -34,15 +35,7 @@ class CatRepository(
         emit(detailedCats)
     }
 
-    private suspend fun getCatDetails(cat: CatImageResponse): CatImageResponse {
-        return try {
-            apiService.searchCatById(cat.id)
-        } catch (e: Exception) {
-            cat
-        }
-    }
-
-    suspend fun getCatById(id: String): Result<CatImageResponse> {
+    suspend fun getCatById(id: String): Result<ImageDto> {
         return try {
             val cat = apiService.searchCatById(id)
             Result.success(cat)
@@ -52,19 +45,15 @@ class CatRepository(
     }
 
     //addFavoriteCat
-
-    suspend fun addFavoriteCat(favoriteRequest: FavoriteRequest, apiKey: String): Result<FavoriteAddResponse>{
-        return try {
-            // 1. Buscar lista básica de gatos
-            val catFavorite = apiService.addFavoriteCatById(favoriteRequest = favoriteRequest, apiKey = apiKey)
-            Result.success(catFavorite)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    fun addFavoriteCat(image: ImageDto, apiKey: String): Flow<CreateFavoriteResponseDto> = flow{
+        emit(apiService.addFavoriteCatById(
+            CreateFavoriteRequestDto(imageId = image.id, subId = BuildConfig.SUB_ID),
+            apiKey = apiKey)
+        )
     }
 
     //searchFavoriteCats
-    suspend fun getFavoriteCatsList(apiKey: String): Result<List<FavoriteResponse>> {
+    suspend fun getFavoriteCatsList(apiKey: String): Result<List<FavoriteDto>> {
         return try {
             val catFavoriteList = apiService.searchFavoriteCats(apiKey = apiKey)
             Result.success(catFavoriteList)
@@ -74,12 +63,11 @@ class CatRepository(
     }
 
     //removeFavoriteCatById
-    suspend fun removeFavoriteCat(favouriteId: Int, apiKey: String):  Result<Response<Unit>>{
-        return try {
-            val catFavoriteList = apiService.removeFavoriteCatById(favouriteId = favouriteId, apiKey = apiKey)
-            Result.success(catFavoriteList)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    fun removeFavoriteCat(favoriteId: Int, apiKey: String): Flow<Response<Unit>> = flow {
+        emit(apiService.removeFavoriteCatById(favoriteId = favoriteId, apiKey = apiKey))
+    }
+
+    fun getFavoriteCatById(favoriteId: Int, apiKey: String): Flow<FavoriteDto> = flow {
+        emit(apiService.getFavoriteCatById(favoriteId = favoriteId, apiKey = apiKey))
     }
 }

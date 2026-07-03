@@ -2,7 +2,7 @@ package com.marianagoto.catimagelist.data.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class FavoriteRequest(
+data class CreateFavoriteRequestDto(
     @SerializedName("image_id") val imageId: String,
-    @SerializedName("sub_id") val subId: String
+    @SerializedName("sub_id") val subId: String? = null
 )

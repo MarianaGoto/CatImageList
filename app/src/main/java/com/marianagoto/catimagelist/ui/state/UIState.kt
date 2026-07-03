@@ -1,6 +1,4 @@
-package com.marianagoto.catimagelist.ui.helpers
-
-import com.marianagoto.catimagelist.ui.catlist.CatUiState
+package com.marianagoto.catimagelist.ui.state
 
 sealed class UIState<out T> {
     object Loading : UIState<Nothing>()

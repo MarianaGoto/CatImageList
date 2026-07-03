@@ -2,7 +2,7 @@ package com.marianagoto.catimagelist.data.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class BreedResponse(
+data class BreedDto(
     val id: String,
     val name: String,
     val weight: Weight?,
@@ -11,6 +11,7 @@ data class BreedResponse(
     @SerializedName("breed_group") val breedGroup: String,
     val origin: String?
 )
+
 
 data class Weight(
     val imperial: String,

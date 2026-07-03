@@ -3,23 +3,14 @@ package com.marianagoto.catimagelist
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.marianagoto.catimagelist.databinding.ActivityMainBinding
-import com.marianagoto.catimagelist.di.CatViewModelFactory
-import com.marianagoto.catimagelist.ui.catlist.CatUiState
-import com.marianagoto.catimagelist.ui.viewmodel.CatViewModel
-import com.marianagoto.catimagelist.util.AnimationUtils
-import com.marianagoto.catimagelist.ErrorFragment
-import com.marianagoto.catimagelist.ui.helpers.UIState
+import com.marianagoto.catimagelist.ui.util.AnimationUtils
 import com.marianagoto.catimagelist.ui.screens.favorites.FavoritesFragment
 import com.marianagoto.catimagelist.ui.screens.home.HomeFragment
-import com.marianagoto.catimagelist.ui.screens.home.HomeViewModel
 
 
 class MainActivity : AppCompatActivity() {
@@ -53,12 +44,6 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Animation", "Clicou em Favoritos - ID: ${item.itemId}")
                     animateIconOnly(R.id.menu_favorites)
                     openFragment(FavoritesFragment())
-//                    val favorites = viewModel.getFavorites()
-//                    if (favorites.isEmpty()) {
-//                        openFragment(EmptyFavoritesFragment())
-//                    } else {
-//                        openFragment(FavoritesFragment())
-//                    }
                     true
                 }
 
