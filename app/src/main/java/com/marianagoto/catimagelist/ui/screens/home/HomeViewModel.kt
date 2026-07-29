@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.data.repository.CatRepository
 import com.marianagoto.catimagelist.domain.mapper.catImageDTOToVO
+import com.marianagoto.catimagelist.domain.mapper.catImageVOToCatItemVO
 import com.marianagoto.catimagelist.domain.mapper.catImageVOToDTO
+import com.marianagoto.catimagelist.ui.state.FavoriteEvent
+import com.marianagoto.catimagelist.ui.state.FavoriteUpdateEvent
 import com.marianagoto.catimagelist.ui.state.UIState
 import com.marianagoto.catimagelist.ui.vo.CatItemVO
 import com.marianagoto.catimagelist.ui.vo.CatImageVO
@@ -23,15 +26,41 @@ import kotlinx.coroutines.launch
 
 
 class HomeViewModel(private val repository: CatRepository) : ViewModel() {
-    private val _cats = MutableStateFlow<UIState<List<CatImageVO>>>(UIState.Loading)
-    val cats: StateFlow<UIState<List<CatImageVO>>> = _cats.asStateFlow()
+    private val _cats = MutableStateFlow<UIState<List<CatItemVO>>>(UIState.Loading)
+    val cats: StateFlow<UIState<List<CatItemVO>>> = _cats.asStateFlow()
 
     private val _favoriteBreedName = MutableSharedFlow<String>(0)
     val favoriteBreedName: SharedFlow<String> = _favoriteBreedName.asSharedFlow()
 
+    private val _favoriteEvent = MutableSharedFlow<FavoriteEvent>(0)
+    val favoriteEvent: SharedFlow<FavoriteEvent> = _favoriteEvent.asSharedFlow()
+
+    private val _favoriteUpdateEvent = MutableSharedFlow<FavoriteUpdateEvent>(0)
+    val favoriteUpdateEvent: SharedFlow<FavoriteUpdateEvent> = _favoriteUpdateEvent.asSharedFlow()
+
+    private var favoritesByImageId: Map<String, Int> = emptyMap()
+
 
     fun getCats() {
         viewModelScope.launch {
+            repository.getFavoriteCatsList(apiKey = BuildConfig.API_KEY)
+                .catch { error ->
+                    Log.e("HomeViewModel", "Erro ao carregar favoritos: ${error.message}")
+                    favoritesByImageId = emptyMap()
+                }
+                .collect { favoritesList ->
+                    favoritesByImageId = favoritesList.associate { favorite ->
+                        favorite.imageId to favorite.id
+                }
+                    Log.d("HomeViewModel", "Favoritos carregados: ${favoritesByImageId.size}")
+                }
+
+
+
+
+
+
+
             repository.getCatsList(limit = 20)
                 .onStart {
                     _cats.value = UIState.Loading
@@ -43,28 +72,109 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
                 }
                 .collect { detailedCats ->
                     val catListVO = catImageDTOToVO(detailedCats)
-                    _cats.value = UIState.Success(catListVO)
+                    val catItemsWithFavorites = catListVO.map { catImageVO ->
+                        val favoriteId = favoritesByImageId[catImageVO.id]
+                        CatItemVO(
+                            image = catImageVO,
+                            favoriteId = favoriteId
+                        )
+                    }
+                    _cats.value = UIState.Success(catItemsWithFavorites)
                 }
         }
     }
 
 //      * Alternar o status de favorito de um gato.
-    fun addFavorite(cat: CatImageVO, subId: String) {
+    fun addFavorite(cat: CatImageVO) {
+        val catItem = catImageVOToCatItemVO(cat)
+        viewModelScope.launch {
+            // Converte VO para DTO (padrão do projeto)
+            val imageDto = catImageVOToDTO(cat)
+
+            // Chama repository com Flow
+            repository.addFavoriteCat(imageDto, BuildConfig.API_KEY)
+                .catch { error ->
+                    val msg = error.localizedMessage ?: "Erro desconhecido"
+                    Log.e("HomeViewModel", "Erro ao favoritar gato: $msg", error)
+
+                    // Emite evento de erro
+                    _favoriteEvent.emit(
+                        FavoriteEvent.Error("Não foi possível favoritar este gato")
+                    )
+                }
+                .collect { response ->
+                    Log.d(
+                        "HomeViewModel",
+                        "Gato favoritado com sucesso! ID: ${response.id} | ${catItem.isFavorite}"
+                    )
+                    favoritesByImageId = favoritesByImageId.toMutableMap().apply {
+                        put(cat.id, response.id)
+                    }
+
+                    updateCatFavoriteStatus(cat.id, response.id)
+
+                    // Emite evento de sucesso
+                    val breedName = cat.breeds.firstOrNull()?.name ?: "Gatinho fofo"
+                    _favoriteEvent.emit(
+                        FavoriteEvent.Success(breedName)
+                    )
+
+                    _favoriteUpdateEvent.emit(
+                        FavoriteUpdateEvent.FavoriteAdded(cat.id, response.id)
+                    )
+                }
+        }
 
     }
 
 
-    fun removeFavoriteCat(cat: CatImageVO, favoriteCat: FavoriteRichVO) {
+    fun removeFavorite(favoriteId: Int, imageId: String, breedName: String) {
         viewModelScope.launch {
-            repository.removeFavoriteCat(favoriteId = favoriteCat.favoriteId, apiKey = BuildConfig.API_KEY)
+            repository.removeFavoriteCat(favoriteId, BuildConfig.API_KEY)
                 .catch { error ->
-                    val msg = error.localizedMessage ?: "Erro ao remover"
-                    Log.e("FavoritesViewModel", "Falha ao remover favorito: ${favoriteCat.favoriteId}")
+                    val msg = error.localizedMessage ?: "Erro desconhecido"
+                    Log.e("HomeViewModel", "Erro ao remover favorito: $msg", error)
+
+                    _favoriteEvent.emit(
+                        FavoriteEvent.Error("Não foi possível remover dos favoritos")
+                    )
                 }
                 .collect { response ->
-                    Log.d("FavoritesViewModel", "Deletado com sucesso ID: ${favoriteCat.favoriteId}.")
+                    Log.d("HomeViewModel", "Gato removido dos favoritos com sucesso! ID: $favoriteId")
+
+                    favoritesByImageId = favoritesByImageId.toMutableMap().apply {
+                        remove(imageId)
+                    }
+                    updateCatFavoriteStatus(imageId, null)
+
+
+                    _favoriteEvent.emit(
+                        FavoriteEvent.Success("$breedName removido dos favoritos")
+                    )
+
+                    _favoriteUpdateEvent.emit(
+                        FavoriteUpdateEvent.FavoriteRemoved(imageId)
+                    )
                 }
         }
+    }
+
+
+    private fun updateCatFavoriteStatus(imageId: String, newFavoriteId: Int?) {
+        val currentState = _cats.value
+        if (currentState !is UIState.Success) return
+
+        // Atualizar apenas o item que mudou
+        val updatedCats = currentState.data.map { catItem ->
+            if (catItem.image.id == imageId) {
+                // ✅ Atualizar favoriteId deste gato
+                catItem.copy(favoriteId = newFavoriteId)
+            } else {
+                catItem
+            }
+        }
+
+        _cats.value = UIState.Success(updatedCats)
     }
 
     fun getFavoritesById(favoriteCat: Int){
@@ -80,23 +190,15 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
         }
     }
 
-    /** Chamado pelo tap no ícone de coração de um card na Home. */
-    fun onToggleFavorite(item: CatItemVO) {
-        viewModelScope.launch {
-            if (item.favoriteId != null) {
-                repository.removeFavoriteCat(item.favoriteId, BuildConfig.API_KEY)
-                    .catch { error -> }
-                    .collect {}
-            } else {
-                val catVO = catImageVOToDTO(item.image)
-                repository.addFavoriteCat(catVO, BuildConfig.API_KEY)
-                    .catch { error -> }
-                    .collect {
-                        Log.d("HomeViewModel", "gatinho favoritado!")
-//                        _favoriteBreedName.emit(cat.breeds.firstOrNull()?.name ?: "Sem raça definida") }
-
-                    }
-            }
+    fun toggleFavorite(item: CatItemVO) {
+        Log.d("HomeViewModel", "toggleFavorite - isFavorite: ${item.isFavorite}, favoriteId: ${item.favoriteId}")
+        if (item.isFavorite) {
+            // Remove dos favoritos
+            val breedName = item.image.breeds.firstOrNull()?.name ?: "Gatinho"
+            removeFavorite(item.favoriteId!!, item.image.id, breedName)
+        } else {
+            // Adiciona aos favoritos
+            addFavorite(item.image)
         }
     }
 

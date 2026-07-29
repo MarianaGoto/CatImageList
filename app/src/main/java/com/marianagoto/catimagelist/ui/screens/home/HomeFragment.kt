@@ -10,9 +10,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.databinding.FragmentHomeBinding
 import com.marianagoto.catimagelist.ui.adapter.HomeCatAdapter
+import com.marianagoto.catimagelist.ui.state.FavoriteEvent
+import com.marianagoto.catimagelist.ui.state.FavoriteUpdateEvent
 import com.marianagoto.catimagelist.ui.util.ToastHelper.ShowCustomSnackbar
 import com.marianagoto.catimagelist.ui.state.UIState
 import com.marianagoto.catimagelist.ui.util.lifecycleScopeRepeat
+import com.marianagoto.catimagelist.ui.vo.CatItemVO
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : Fragment() {
@@ -37,12 +40,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        adapter = HomeCatAdapter { cat ->
-            if (cat.isFavorite) {
-                lifecycleScopeRepeat {
-                    viewModel.addFavorite(cat = cat, subId = BuildConfig.SUB_ID)
-                }
-            }
+        adapter = HomeCatAdapter { catItem ->
+            viewModel.toggleFavorite(catItem)
         }
 
         binding.recyclerViewHome.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -91,18 +90,45 @@ class HomeFragment : Fragment() {
                         binding.ltLoading.visibility = View.GONE
                         binding.errorLayout.nsError.visibility = View.GONE
                         binding.recyclerViewHome.visibility = View.VISIBLE
-                        adapter.submitList(uiState.data)
+                        val catItems = uiState.data.map { cat ->
+                            CatItemVO(image = cat.image, favoriteId = null)
+                        } //fazer mapper
+                        adapter.submitList(catItems)
                     }
                 }
             }
         }
 
         lifecycleScopeRepeat {
-            viewModel.favoriteBreedName.collect { favoriteBreedName ->
-                ShowCustomSnackbar(view = binding.root, breedName = favoriteBreedName)
-
+            viewModel.favoriteEvent.collect { event ->
+                when (event) {
+                    is FavoriteEvent.Success -> {
+                        ShowCustomSnackbar(view = binding.root, breedName = event.message)
+                    }
+                    is FavoriteEvent.Error -> {
+                        ShowCustomSnackbar(view = binding.root, breedName = event.message)
+                    }
+                }
             }
         }
+
+        lifecycleScopeRepeat {
+            viewModel.favoriteUpdateEvent.collect { event ->
+                when (event) {
+                    is FavoriteUpdateEvent.FavoriteAdded -> {
+                        // A lista já foi atualizada via updateCatFavoriteStatus()
+                        // Adapter se atualiza automaticamente via StateFlow
+                    }
+                    is FavoriteUpdateEvent.FavoriteRemoved -> {
+                        // A lista já foi atualizada via updateCatFavoriteStatus()
+                        // Adapter se atualiza automaticamente via StateFlow
+                    }
+                }
+            }
+        }
+
+
+
     }
 
     override fun onDestroyView() {

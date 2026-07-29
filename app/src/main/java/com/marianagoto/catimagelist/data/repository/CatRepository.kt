@@ -53,13 +53,9 @@ class CatRepository(
     }
 
     //searchFavoriteCats
-    suspend fun getFavoriteCatsList(apiKey: String): Result<List<FavoriteDto>> {
-        return try {
-            val catFavoriteList = apiService.searchFavoriteCats(apiKey = apiKey)
-            Result.success(catFavoriteList)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    fun getFavoriteCatsList(apiKey: String): Flow<List<FavoriteDto>> = flow {
+        emit(apiService.searchFavoriteCats(apiKey = apiKey))
+
     }
 
     //removeFavoriteCatById

@@ -9,10 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.marianagoto.catimagelist.databinding.FragmentFavoritesBinding
 import com.marianagoto.catimagelist.ui.adapter.FavoriteCatAdapter
+import com.marianagoto.catimagelist.ui.state.FavoriteEvent
 import com.marianagoto.catimagelist.ui.state.UIState
+import com.marianagoto.catimagelist.ui.util.ToastHelper.ShowCustomSnackbar
 import com.marianagoto.catimagelist.ui.util.lifecycleScopeRepeat
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.getValue
 
 class FavoritesFragment : Fragment() {
     private var _binding: FragmentFavoritesBinding? = null
@@ -37,11 +38,12 @@ class FavoritesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = FavoriteCatAdapter { cat ->
-            Log.d("CatAdapter","favoriteid: ${cat.favoriteId}")
+            Log.d("CatAdapter", "favoriteid: ${cat.favoriteId}")
 
-            cat.favoriteId?.let{ id ->
-                viewModel.removeFavoriteCat(id)
-            }
+            viewModel.removeFavoriteCat(
+                favoriteId = cat.favoriteId,
+                breedName = cat.breedName
+            )
         }
 
         binding.recyclerViewFavorites.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -49,7 +51,7 @@ class FavoritesFragment : Fragment() {
 
         setupObservables()
 
-        binding.errorLayout.btnRetry.setOnClickListener{
+        binding.errorLayout.btnRetry.setOnClickListener {
             viewModel.getFavoriteCats()
         }
     }
@@ -81,9 +83,18 @@ class FavoritesFragment : Fragment() {
                 }
             }
         }
-//        viewModel.snackbarMessage.observe(viewLifecycleOwner) { message ->
-//            showToast(context = requireContext(),message = message)
-//        }
+        lifecycleScopeRepeat {
+            viewModel.favoritesEvent.collect { event ->
+                when (event) {
+                    is FavoriteEvent.Success -> {
+                        ShowCustomSnackbar(view = binding.root, breedName = event.message)
+                    }
+                    is FavoriteEvent.Error -> {
+                        ShowCustomSnackbar(view = binding.root, breedName = event.message)
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {

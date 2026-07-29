@@ -4,6 +4,7 @@ import com.marianagoto.catimagelist.data.dto.BreedDto
 import com.marianagoto.catimagelist.data.dto.ImageDto
 import com.marianagoto.catimagelist.ui.vo.BreedVO
 import com.marianagoto.catimagelist.ui.vo.CatImageVO
+import com.marianagoto.catimagelist.ui.vo.CatItemVO
 
 fun catImageDTOToVO(imageDto: ImageDto): CatImageVO {
     var breedsVO: List<BreedVO>
@@ -28,4 +29,10 @@ fun catImageVOToDTO(imageVO: CatImageVO): ImageDto {
 
 fun catImageVOToDTO(imageVOList: List<CatImageVO>): List<ImageDto> {
     return imageVOList.map { item -> catImageVOToDTO(item) }
+}
+
+
+//CatImageVO to CatItemVO
+fun catImageVOToCatItemVO(imageVO: CatImageVO): CatItemVO {
+    return CatItemVO(image = imageVO, favoriteId = null)
 }

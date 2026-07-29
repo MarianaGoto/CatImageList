@@ -9,10 +9,14 @@ import com.marianagoto.catimagelist.BuildConfig
 import com.marianagoto.catimagelist.data.repository.CatRepository
 import com.marianagoto.catimagelist.domain.mapper.favoriteRichResponseToFavoriteRichVO
 import com.marianagoto.catimagelist.domain.usecase.GetFavoriteCatsUseCase
+import com.marianagoto.catimagelist.ui.state.FavoriteEvent
 import com.marianagoto.catimagelist.ui.state.UIState
 import com.marianagoto.catimagelist.ui.vo.FavoriteRichVO
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -23,6 +27,9 @@ class FavoritesViewModel(private val repository: CatRepository, private val getF
 
     private val _snackbarMessage = MutableLiveData<String>()
     val snackbarMessage: LiveData<String> = _snackbarMessage
+
+    private val _favoritesEvent = MutableSharedFlow<FavoriteEvent>(0)
+    val favoritesEvent: SharedFlow<FavoriteEvent> = _favoritesEvent.asSharedFlow()
 
 
     fun getFavoriteCats() {
@@ -41,17 +48,25 @@ class FavoritesViewModel(private val repository: CatRepository, private val getF
         }
     }
 
-    fun removeFavoriteCat(favoriteId: Int) {
+    fun removeFavoriteCat(favoriteId: Int, breedName: String) {
         viewModelScope.launch {
             repository.removeFavoriteCat(favoriteId = favoriteId, apiKey = BuildConfig.API_KEY)
                 .catch { error ->
                     val msg = error.localizedMessage ?: "Erro ao remover"
                     Log.e("FavoritesViewModel", "Falha ao remover favorito: $msg")
+
+                    _favoritesEvent.emit(
+                        FavoriteEvent.Error("Não foi possível remover dos favoritos")
+                    )
                 }
                 .collect {
                     Log.d("FavoritesViewModel", "Deletado com sucesso ID: $favoriteId")
+
+                    _favoritesEvent.emit(
+                        FavoriteEvent.Success("$breedName removido dos favoritos 😢")
+                    )
+
                     getFavoriteCats()
-                    _snackbarMessage.value = "Removido dos favoritos"
                 }
         }
     }
