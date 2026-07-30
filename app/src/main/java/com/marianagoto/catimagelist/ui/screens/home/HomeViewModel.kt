@@ -18,15 +18,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import com.marianagoto.catimagelist.ui.event.FavoriteEvent
 
 
 class HomeViewModel(private val repository: CatRepository) : ViewModel() {
+
     private val _cats = MutableStateFlow<UIState<List<CatImageVO>>>(UIState.Loading)
     val cats: StateFlow<UIState<List<CatImageVO>>> = _cats.asStateFlow()
 
-
-    private val _favoriteBreedName = MutableSharedFlow<String>(0)
-    val favoriteBreedName: SharedFlow<String> = _favoriteBreedName.asSharedFlow()
+    private val _favoriteEvent  = MutableSharedFlow<FavoriteEvent>(0)
+    val favoriteEvent : SharedFlow<FavoriteEvent> = _favoriteEvent .asSharedFlow()
 
 
     fun getCats() {
@@ -47,52 +48,108 @@ class HomeViewModel(private val repository: CatRepository) : ViewModel() {
         }
     }
 
-//      * Alternar o status de favorito de um gato.
-      fun toggleFavorite(cat: CatImageVO, subId: String) {
+    private val favoriteRequestsInFlight = mutableSetOf<String>()
 
-        val favoriteRequest = FavoriteRequest(imageId = cat.id, subId = subId)
+    fun toggleFavorite(cat: CatImageVO, subId: String) {
+        if (!favoriteRequestsInFlight.add(cat.id)) return
 
         viewModelScope.launch {
-            val result = repository.addFavoriteCat(
-                favoriteRequest = favoriteRequest, apiKey = BuildConfig.API_KEY
-            )
-            result.fold(
-                onSuccess = { response ->
-                    Log.d("CatViewModel", "gatinho favoritado!")
+            updateCat(cat.id) { it.copy(isLoadingFavorite = true) }
 
-//                    cat.favoriteId = response.id
-//                    cat.isFavorite = true
-                    _favoriteBreedName.emit(cat.breeds.firstOrNull()?.name ?: "Sem raça definida")
-                },
-                onFailure = { error ->
-                    val msg = error.localizedMessage ?: "Erro desconhecido"
-                    Log.e("CatViewModel", "Erro ao adicionar favorito: $msg", error)
-
-//                    cat.isFavorite = false
-                    _cats.value = UIState.Error
+            try {
+                if (cat.isFavorite) {
+                    removeFavorite(cat)
+                } else {
+                    addFavorite(cat, subId)
                 }
-            )
+            } finally {
+                favoriteRequestsInFlight.remove(cat.id)
+            }
         }
     }
 
+    private suspend fun addFavorite(cat: CatImageVO, subId: String) {
+        val request = FavoriteRequest(
+            imageId = cat.id,
+            subId = subId
+        )
 
-    fun removeFavoriteCat(favouriteId: Int) {
-        viewModelScope.launch {
-            val result = repository.removeFavoriteCat(favouriteId = favouriteId, apiKey = BuildConfig.API_KEY)
-
-            result.fold(
-                onSuccess = { catList ->
-                    Log.d("FavoritesViewModel", "Deletado com sucesso ID: $favouriteId")
-
-//                    _snackbarMessage.value = "Removido dos favoritos"
-
-                },
-                onFailure = { error ->
-                    val msg = error.localizedMessage ?: "Erro ao remover"
-                    Log.e("FavoritesViewModel", "Falha ao remover favorito: $msg")
+        repository.addFavoriteCat(
+            favoriteRequest = request,
+            apiKey = BuildConfig.API_KEY
+        ).fold(
+            onSuccess = { response ->
+                updateCat(cat.id) {
+                    it.copy(
+                        isFavorite = true,
+                        favoriteId = response.id,
+                        isLoadingFavorite = false
+                    )
                 }
-            )
+
+                _favoriteEvent.emit(
+                    FavoriteEvent.Added(
+                        cat.breeds.firstOrNull()?.name ?: "Gatinho"
+                    )
+                )
+                Log.d("HomeViewModel", "Gatinho adicionado aos favoritos")
+            },
+            onFailure = {
+                updateCat(cat.id) { current ->
+                    current.copy(isLoadingFavorite = false)
+                }
+            }
+        )
+    }
+
+    private suspend fun removeFavorite(cat: CatImageVO) {
+        val favoriteId = cat.favoriteId
+
+        if (favoriteId == null) {
+            updateCat(cat.id) { current ->
+                current.copy(isLoadingFavorite = false)
+            }
+            return
         }
+
+        repository.removeFavoriteCat(
+            favouriteId = favoriteId,
+            apiKey = BuildConfig.API_KEY
+        ).fold(
+            onSuccess = {
+                updateCat(cat.id) {
+                    it.copy(
+                        isFavorite = false,
+                        favoriteId = null,
+                        isLoadingFavorite = false
+                    )
+                }
+                _favoriteEvent.emit(
+                    FavoriteEvent.Removed(
+                        cat.breeds.firstOrNull()?.name ?: "Gatinho"
+                    )
+                )
+                Log.d("HomeViewModel", "Gatinho removido dos favoritos")
+            },
+            onFailure = {
+                updateCat(cat.id) { current ->
+                    current.copy(isLoadingFavorite = false)
+                }
+            }
+        )
+    }
+
+    private fun updateCat(
+        catId: String,
+        transform: (CatImageVO) -> CatImageVO
+    ) {
+        val currentList = (_cats.value as? UIState.Success)?.data ?: return
+
+        _cats.value = UIState.Success(
+            currentList.map { cat ->
+                if (cat.id == catId) transform(cat) else cat
+            }
+        )
     }
 
     private fun logCatDetails(cats: List<CatImageVO>) {

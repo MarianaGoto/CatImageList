@@ -12,6 +12,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
 import retrofit2.Response
 
 class CatRepository(
@@ -74,12 +75,17 @@ class CatRepository(
     }
 
     //removeFavoriteCatById
-    suspend fun removeFavoriteCat(favouriteId: Int, apiKey: String):  Result<Response<Unit>>{
+    suspend fun removeFavoriteCat(favouriteId: Int, apiKey: String): Result<Unit>{
         return try {
-            val catFavoriteList = apiService.removeFavoriteCatById(favouriteId = favouriteId, apiKey = apiKey)
-            Result.success(catFavoriteList)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+            val response =
+                apiService.removeFavoriteCatById(favouriteId = favouriteId, apiKey = apiKey)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(HttpException(response))
+            }
+        }catch (exception: Exception) {
+                Result.failure(exception)
+            }
     }
 }
