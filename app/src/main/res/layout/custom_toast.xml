@@ -28,7 +28,23 @@
             app:layout_constraintEnd_toStartOf="@+id/llContentText2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/red_300" />
+            app:tint="@color/red_300"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tvEmoji2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:text="😻"
+            android:textSize="18sp"
+            android:layout_marginEnd="2dp"
+            android:textColor="@color/medium_gray"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/llContentText2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:id="@+id/llContentText2"
@@ -55,9 +71,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:text="adicionado aos favoritos!"
+                android:text="adicionado aos favoritos"
                 android:textColor="@color/gray_300"
                 android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvEmoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:text="😻"
+                android:textSize="18sp"
+                android:layout_marginStart="2dp"
+                android:textColor="@color/medium_gray"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/llContentText2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
         </LinearLayout>
 
         <ImageView

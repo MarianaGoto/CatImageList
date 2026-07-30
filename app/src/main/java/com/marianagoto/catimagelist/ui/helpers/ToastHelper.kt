@@ -40,11 +40,14 @@ object ToastHelper {
     }
 
     @SuppressLint("RestrictedApi")
-    fun ShowCustomSnackbar(view: View, breedName: String) {
+    fun showCustomSnackbar(view: View, breedName: String, message: String, icon: String) {
         val snackbar = Snackbar.make(view, "", Snackbar.LENGTH_SHORT)
         val inflater = LayoutInflater.from(view.context)
         val snackBinding = CustomToastBinding.inflate(inflater)
         snackBinding.tvBreed.text = breedName
+        snackBinding.tvMessage.text = message
+        snackBinding.tvEmoji.text = icon
+
         val snackbarLayout = snackbar.view as Snackbar.SnackbarLayout
 
         snackbarLayout.setBackgroundColor(android.graphics.Color.TRANSPARENT)

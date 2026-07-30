@@ -54,7 +54,6 @@ class HomeCatAdapter(
 
                 currentCat?.let { cat ->
                     AnimationUtils.animatePop(binding.ivFavoriteIcon)
-                    cat.isFavorite = !cat.isFavorite
                     updateFavoriteUI(cat)
                     currentOnFavoriteClick?.invoke(cat)
                 }
@@ -73,13 +72,14 @@ class HomeCatAdapter(
             tvSubtitleImg.text = breed?.origin ?: "Sem informações"
             updateFavoriteUI(cat)
 
+            ivFavoriteIcon.isEnabled = !cat.isLoadingFavorite
+            ivFavoriteIcon.alpha = if (cat.isLoadingFavorite) 0.5f else 1f
+
             ivFavoriteIcon.setOnClickListener { view ->
-                val currentTime = System.currentTimeMillis()
-                if (currentTime - lastClickTime < 500) return@setOnClickListener
-                lastClickTime = currentTime
+                if (cat.isLoadingFavorite) return@setOnClickListener
+                currentOnFavoriteClick?.invoke(cat)
 
                 AnimationUtils.animatePop(view)
-                cat.isFavorite = !cat.isFavorite
                 updateFavoriteUI(cat)
                 onFavoriteClick(cat)
             }

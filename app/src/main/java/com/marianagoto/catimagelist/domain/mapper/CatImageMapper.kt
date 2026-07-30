@@ -13,7 +13,7 @@ fun catImageDTOToVO(catImageResponse: CatImageResponse): CatImageVO {
         breedsVO = breedDTOToVO(catImageResponse.breeds)
     }
 
-    return CatImageVO(id = catImageResponse.id, url = catImageResponse.url, isFavorite = false, breeds = breedsVO)
+    return CatImageVO(id = catImageResponse.id, url = catImageResponse.url, isFavorite = false, breeds = breedsVO, favoriteId = null)
 }
 
 fun catImageDTOToVO(catImageResponseList: List<CatImageResponse>): List<CatImageVO> {
