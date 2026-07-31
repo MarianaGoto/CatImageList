@@ -11,6 +11,8 @@ localProperties.load(rootProject.file("local.properties").inputStream())
 val apiKey = localProperties.getProperty("API_KEY") ?: ""
 val subId = localProperties.getProperty("SUB_ID") ?: ""
 
+val googleId = localProperties.getProperty("GOOGLE_WEB_CLIENT_ID") ?: ""
+
 android {
     namespace = "com.marianagoto.catimagelist"
     compileSdk {
@@ -36,6 +38,12 @@ android {
             "String",
             "SUB_ID",
             "\"$subId\""
+        )
+
+        buildConfigField(
+            "String",
+            "GOOGLE_WEB_CLIENT_ID",
+            "\"$googleId\""
         )
     }
 
@@ -86,6 +94,11 @@ dependencies {
     implementation(libs.koin)
     implementation(libs.androidx.material3)
     implementation(libs.kotlinx.coroutines)
+    implementation(libs.androidx.credentials.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.google.auth)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.annotation)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -13,4 +13,10 @@
         android:iconTint="@color/red_300"
         android:title="Favoritos" />
 
+    <item
+        android:id="@+id/menu_login"
+        android:icon="@drawable/ic_login"
+        android:iconTint="@color/medium_blue"
+        android:title="Login" />
+
 </menu>

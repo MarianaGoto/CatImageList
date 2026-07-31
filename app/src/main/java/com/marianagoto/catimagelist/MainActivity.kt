@@ -20,6 +20,7 @@ import com.marianagoto.catimagelist.ui.helpers.UIState
 import com.marianagoto.catimagelist.ui.screens.favorites.FavoritesFragment
 import com.marianagoto.catimagelist.ui.screens.home.HomeFragment
 import com.marianagoto.catimagelist.ui.screens.home.HomeViewModel
+import com.marianagoto.catimagelist.ui.screens.login.LoginFragment
 
 
 class MainActivity : AppCompatActivity() {
@@ -53,12 +54,12 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Animation", "Clicou em Favoritos - ID: ${item.itemId}")
                     animateIconOnly(R.id.menu_favorites)
                     openFragment(FavoritesFragment())
-//                    val favorites = viewModel.getFavorites()
-//                    if (favorites.isEmpty()) {
-//                        openFragment(EmptyFavoritesFragment())
-//                    } else {
-//                        openFragment(FavoritesFragment())
-//                    }
+                    true
+                }
+                R.id.menu_login -> {
+                    Log.d("Animation", "Clicou em Login - ID: ${item.itemId}")
+                    animateIconOnly(R.id.menu_login)
+                    openFragment(LoginFragment())
                     true
                 }
 
